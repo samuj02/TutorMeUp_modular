@@ -22,8 +22,26 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
     if (response.body == 'Login successful') {
       Navigator.pushReplacementNamed(context, '/inicio');
     } else {
-      print('Error: ${response.body}');
+      _showErrorDialog(context, 'Error: ${response.body}');
     }
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Login Failed'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Okay'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'interfazInicioSesion.dart'; // Importa la interfaz de inicio de sesión
 import 'interfazRegistrarse.dart'; // Importar la interfaz de Registro
+import 'interfazTutorias.dart'; 
+import 'interfazAgenda.dart'; 
 import 'inicioApp.dart'; 
 
 void main() {
@@ -20,8 +22,8 @@ class TutorMeUpApp extends StatelessWidget {
         '/registrarse': (context) => PantallaRegistrarse(),
         '/home': (context) => TutorMeUpApp(),
         '/inicio': (context) => InicioApp(),
-        //'/tutorias': (context) => TutoriasScreen(),
-        //'/agenda': (context) => AgendaScreen(),
+        '/tutorias': (context) => TutoriasScreen(),
+        '/agenda': (context) => AgendaScreen(),
       },
     );
   }
@@ -45,7 +47,7 @@ class HomePage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  '¡TutorMeApp!',
+                  '¡TutorMeUp!',
                   style: TextStyle(
                     fontSize: 40.0,
                     color: const Color.fromARGB(255, 5, 5, 5),
