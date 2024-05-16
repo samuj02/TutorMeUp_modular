@@ -31,47 +31,74 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('TutorMeUp'),
-      ),
-      backgroundColor: Colors.blue,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              '¡Bienvenido!',
-              style: TextStyle(fontSize: 40.0),
-            ),
-            SizedBox(height: 100),
-            Column(
+      body: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          // Imagen de fondo
+          Image.asset(
+            'assets/images/fondoInicio.png',
+            fit: BoxFit.cover,
+          ),
+          // Contenido encima de la imagen
+          Center(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 200,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/inicioSesion');
-                    },
-                    child: const Text('Iniciar Sesión'),
+              children: <Widget>[
+                Text(
+                  '¡TutorMeApp!',
+                  style: TextStyle(
+                    fontSize: 40.0,
+                    color: const Color.fromARGB(255, 5, 5, 5),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 20),
-                SizedBox(
-                  width: 200,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/registrarse');
-                    },
-                    child: const Text('Registrarse'),
-                  ),
+                SizedBox(height: 60),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 250,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/inicioSesion');
+                        },
+                        child: const Text(
+                          'Iniciar Sesión',
+                          style: TextStyle(
+                            color: Colors.black, // Color del texto del botón
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white, // Color del botón
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    SizedBox(
+                      width: 250,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/registrarse');
+                        },
+                        child: const Text(
+                          'Registrarse',
+                          style: TextStyle(
+                            color: Colors.black, // Color del texto del botón
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white, // Color del botón
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

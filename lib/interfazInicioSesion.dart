@@ -29,37 +29,87 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Iniciar Sesión'),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          // Imagen de fondo
+          Image.asset(
+            'assets/images/fondoInicioSesion.png',
+            fit: BoxFit.cover,
+          ),
+          // Contenido encima de la imagen
+          Column(
             children: <Widget>[
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Correo Electrónico',
+              // AppBar transparente
+              AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                 ),
               ),
-              SizedBox(height: 20),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Contraseña',
+              // Contenido principal
+              Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        SizedBox(height: 150), // Espacio ajustado
+                        Center(
+                          child: Text(
+                            'Log In',
+                            style: TextStyle(
+                              fontSize: 40.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue[800], // Color del texto
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        TextField(
+                          controller: _emailController,
+                          decoration: InputDecoration(
+                            labelText: 'Correo Electrónico',
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.8),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        TextField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: 'Contraseña',
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.8),
+                          ),
+                        ),
+                        SizedBox(height: 50),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: _signIn,
+                            child: Text('Iniciar Sesión'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[800], // Color del botón
+                              foregroundColor: Colors.white, // Color del texto del botón
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _signIn,
-                child: Text('Iniciar Sesión'),
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
