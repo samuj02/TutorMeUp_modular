@@ -1,6 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-class PantallaRegistrarse extends StatelessWidget {
+class PantallaRegistrarse extends StatefulWidget {
+  @override
+  _PantallaRegistrarseState createState() => _PantallaRegistrarseState();
+}
+
+class _PantallaRegistrarseState extends State<PantallaRegistrarse> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _register() async {
+    final response = await http.post(
+      Uri.parse('http://localhost/tutormeup/register.php'),
+      body: {
+        'email': _emailController.text,
+        'password': _passwordController.text,
+      },
+    );
+
+    if (response.body == 'New record created successfully') {
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      print('Error: ${response.body}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,12 +39,14 @@ class PantallaRegistrarse extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               TextField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Correo Electrónico',
                 ),
               ),
               SizedBox(height: 20),
               TextField(
+                controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'Contraseña',
@@ -27,9 +54,7 @@ class PantallaRegistrarse extends StatelessWidget {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  // Agrega aquí la lógica para iniciar sesión
-                },
+                onPressed: _register,
                 child: Text('Registrarse'),
               ),
             ],

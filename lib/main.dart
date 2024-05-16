@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'interfazInicioSesion.dart'; // Importa la interfaz de inicio de sesión
 import 'interfazRegistrarse.dart'; // Importar la interfaz de Registro
+import 'inicioApp.dart'; 
 
 void main() {
   runApp(TutorMeUpApp());
@@ -17,6 +18,10 @@ class TutorMeUpApp extends StatelessWidget {
       routes: {
         '/inicioSesion': (context) => PantallaInicioSesion(),
         '/registrarse': (context) => PantallaRegistrarse(),
+        '/home': (context) => TutorMeUpApp(),
+        '/inicio': (context) => InicioApp(),
+        //'/tutorias': (context) => TutoriasScreen(),
+        //'/agenda': (context) => AgendaScreen(),
       },
     );
   }
