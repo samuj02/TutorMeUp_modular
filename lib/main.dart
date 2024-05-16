@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'interfazInicioSesion.dart'; // Importa la interfaz de inicio de sesión
+import 'interfazRegistrarse.dart'; // Importar la interfaz de Registro
 
 void main() {
   runApp(TutorMeUpApp());
@@ -15,6 +16,7 @@ class TutorMeUpApp extends StatelessWidget {
       home: HomePage(),
       routes: {
         '/inicioSesion': (context) => PantallaInicioSesion(),
+        '/registrarse': (context) => PantallaRegistrarse(),
       },
     );
   }
@@ -56,7 +58,7 @@ class HomePage extends StatelessWidget {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Agrega aquí la lógica para manejar el botón de registrarse
+                      Navigator.pushNamed(context, '/registrarse');
                     },
                     child: const Text('Registrarse'),
                   ),
