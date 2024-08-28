@@ -113,10 +113,12 @@ class InicioApp extends StatelessWidget {
  */
 // inicioApp.dart
 import 'package:flutter/material.dart';
+import 'package:modular2/screens/interfazMapa.dart';
 import 'interfazMyTutorias.dart';
 import 'interfazTutorias.dart';
 import 'interfazAgenda.dart';
 import 'popUpMenu.dart';
+import 'InterfazIA.dart';
 
 class InicioApp extends StatelessWidget {
   final int? userId;
@@ -188,6 +190,20 @@ class InicioApp extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => InterfazMyTutorias()),
+                );
+              }),
+              _buildGridButton(
+                  context, 'Mapa', Icons.map, Color(0xFF004BAD), () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MapaScreen()),
+                );
+              }),
+              _buildGridButton(
+                  context, 'Examen IA', Icons.book, Color(0xFF004BAD), () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InterfazIA()),
                 );
               }),
             ],

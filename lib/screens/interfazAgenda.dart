@@ -22,7 +22,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
 
   Future<void> _fetchTutorias() async {
     final response = await http.get(Uri.parse(
-        'http://localhost/tutormeup/obtener_tutorias.php?user_id=${widget.userId}'));
+        'http://189.203.149.247/tutormeup/obtener_tutorias.php?user_id=${widget.userId}'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -35,7 +35,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
 
   Future<void> _registerTutoria(String titulo, String descripcion) async {
     final response = await http.post(
-      Uri.parse('http://localhost/tutormeup/registrar_tutoria.php'),
+      Uri.parse('http://189.203.149.247/tutormeup/registrar_tutoria.php'),
       body: {
         'user_id': widget.userId.toString(),
         'titulo': titulo,
@@ -54,12 +54,31 @@ class _AgendaScreenState extends State<AgendaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mi Agenda'),
+        title: Text(
+          'Mi Agenda',
+          style: TextStyle(
+              fontFamily: 'SF-Pro-Rounded',
+              color: Colors.white,
+              fontSize: 30,
+              fontWeight: FontWeight.w800),
+        ),
+        backgroundColor: Color(0xFF3A6CAD),
       ),
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
+            child: _tutorias.isEmpty
+                ? Center(
+                    child: Text(
+                    '¡Aún no tienes ninguna tutoría publicada! 🤔',
+                    style: TextStyle(
+                        fontFamily: 'SF-Pro-Rounded',
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF3A6CAD)),
+                    textAlign: TextAlign.center,
+                  ))
+                : ListView.builder(
               itemCount: _tutorias.length,
               itemBuilder: (context, index) {
                 return ListTile(
@@ -70,12 +89,29 @@ class _AgendaScreenState extends State<AgendaScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(25.0),
             child: ElevatedButton(
               onPressed: () {
                 _showRegisterDialog();
               },
-              child: Text('Publicar Tutoria'),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF3A6CAD),
+                  foregroundColor: Colors.white,
+                  textStyle: TextStyle(
+                      fontSize: 25,
+                      fontFamily: 'SF-Pro-Text',
+                      fontWeight: FontWeight.w600)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.add_circle_rounded,
+                    size: 30,
+                  ),
+                  SizedBox(width: 8),
+                  Text('Publicar tutoría'),
+                ],
+              ),
             ),
           ),
         ],

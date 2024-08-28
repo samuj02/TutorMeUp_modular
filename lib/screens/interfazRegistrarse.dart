@@ -19,7 +19,7 @@ class _PantallaRegistrarseState extends State<PantallaRegistrarse> {
 
   Future<void> _register() async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2/tutormeup/register.php'),
+      Uri.parse('http://localhost/tutormeup/register.php'),
       body: {
         'nombre': _nombreController.text,
         'apellido': _apellidoController.text,

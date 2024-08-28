@@ -22,7 +22,7 @@ class _InterfazTutoriasState extends State<InterfazTutorias> {
 
   Future<void> _fetchTutorias() async {
     final response = await http.get(Uri.parse(
-        'http://localhost/tutormeup/obtener_tutorias.php?user_id=${widget.userId}'));
+        'http://189.203.149.247/tutormeup/obtener_tutorias.php?user_id=${widget.userId}'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -35,7 +35,7 @@ class _InterfazTutoriasState extends State<InterfazTutorias> {
 
   Future<void> _registerTutoria(String titulo, String descripcion) async {
     final response = await http.post(
-      Uri.parse('http://localhost/tutormeup/registrar_tutoria.php'),
+      Uri.parse('http://189.203.149.247/tutormeup/registrar_tutoria.php'),
       body: {
         'user_id': widget.userId.toString(),
         'titulo': titulo,

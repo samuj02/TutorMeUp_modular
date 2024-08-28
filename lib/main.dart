@@ -6,6 +6,7 @@ import 'package:modular2/screens/interfazTutorias.dart';
 import 'package:modular2/screens/interfazMyTutorias.dart';
 import 'package:modular2/screens/interfazAgenda.dart';
 import 'package:modular2/screens/inicioApp.dart';
+import 'package:modular2/screens/interfazMapa.dart';
 
 void main() {
   runApp(TutorMeUpApp());
@@ -28,6 +29,7 @@ class TutorMeUpApp extends StatelessWidget {
         '/myTutorias': (context) => InterfazMyTutorias(),
         '/miPerfil': (context) => InterfazMiPerfil(),
         '/agenda': (context) => AgendaScreen(),
+        '/mapa': (context) => MapaScreen(),
       },
     );
   }
