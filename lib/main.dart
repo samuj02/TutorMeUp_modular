@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:modular2/screens/interfazMiPerfil.dart';
-import 'package:modular2/screens/interfazInicioSesion.dart'; // Importa la interfaz de inicio de sesión
-import 'package:modular2/screens/interfazRegistrarse.dart'; // Importar la interfaz de Registro
+import 'package:modular2/screens/interfazInicioSesion.dart';
+import 'package:modular2/screens/interfazRegistrarse.dart';
 import 'package:modular2/screens/interfazTutorias.dart';
 import 'package:modular2/screens/interfazMyTutorias.dart';
 import 'package:modular2/screens/interfazAgenda.dart';
 import 'package:modular2/screens/inicioApp.dart';
 import 'package:modular2/screens/interfazMapa.dart';
+import 'package:modular2/screens/InterfazIA.dart';
 
-void main() {
+void main() async {
+  // Asegúrate de que los Widgets de Flutter estén inicializados antes de Firebase
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inicializar Firebase
+  await Firebase.initializeApp();
+
   runApp(TutorMeUpApp());
 }
 
@@ -24,12 +32,13 @@ class TutorMeUpApp extends StatelessWidget {
         '/home': (context) => HomePage(),
         '/inicioSesion': (context) => PantallaInicioSesion(),
         '/registrarse': (context) => PantallaRegistrarse(),
-        '/inicio': (context) => InicioApp(),
+        '/inicio': (context) => InicioApp('user_id'), 
         '/tutorias': (context) => InterfazTutorias(),
         '/myTutorias': (context) => InterfazMyTutorias(),
-        '/miPerfil': (context) => InterfazMiPerfil(),
+        '/miPerfil': (context) => InterfazMiPerfil('user_id'),
         '/agenda': (context) => AgendaScreen(),
         '/mapa': (context) => MapaScreen(),
+        '/inteligenciaA': (context) => InterfazIA(),
       },
     );
   }
@@ -77,7 +86,6 @@ class HomePage extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/inicioSesion');
-                          //MaterialPageRoute(builder: (context) => InicioApp());
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF3D75E4),
@@ -108,8 +116,6 @@ class HomePage extends StatelessWidget {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
-                          /* MaterialPageRoute(
-                              builder: (context) => PantallaRegistrarse()); */
                           Navigator.pushNamed(context, '/registrarse');
                         },
                         child: const Text(

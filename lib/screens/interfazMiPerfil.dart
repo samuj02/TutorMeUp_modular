@@ -1,37 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class InterfazMiPerfil extends StatefulWidget {
-  final int? userId;
-  InterfazMiPerfil([this.userId]);
+  final String userId;
+
+  InterfazMiPerfil(this.userId);
 
   @override
-  State<InterfazMiPerfil> createState() => _InterfazMiPerfil();
+  _InterfazMiPerfilState createState() => _InterfazMiPerfilState();
 }
 
-class _InterfazMiPerfil extends State<InterfazMiPerfil> {
-  //Almacenar los datos del get de la base de datos
-  Map<String, String> userData = {};
+class _InterfazMiPerfilState extends State<InterfazMiPerfil> {
+  Map<String, dynamic> userData = {};
 
   @override
   void initState() {
     super.initState();
-    _fetchUserData(widget.userId);
+    _fetchUserData();
   }
 
-  Future<void> _fetchUserData(user_id) async {
-    final response = await http.get(
-      Uri.parse(
-          'http//localhost/tutormeup/obtener_datosUsuario.php?user_id=${widget.userId}'),
-    );
+  Future<void> _fetchUserData() async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('user')
+          .doc(widget.userId)
+          .get();
 
-    if (response.statusCode == 200) {
+      if (userDoc.exists) {
+        setState(() {
+          userData = userDoc.data() as Map<String, dynamic>;
+        });
+      } else {
+        throw Exception('Usuario no encontrado');
+      }
+    } catch (e) {
+      print('Error al cargar los datos del usuario: $e');
       setState(() {
-        userData = json.decode(response.body);
+        userData = {};
       });
-    } else {
-      throw Exception('Error al cargar los datos del usuario');
     }
   }
 
@@ -39,37 +45,32 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Mi perfil',
-          style: TextStyle(
-              fontFamily: 'SF-Pro-Rounded',
-              color: Colors.white,
-              fontSize: 30,
-              fontWeight: FontWeight.w800),
-        ),
+        title: Text('Mi Perfil'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(
-            16.0), // Ajusta el padding según tus necesidades
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Mis datos',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+        padding: const EdgeInsets.all(16.0),
+        child: userData.isEmpty
+            ? Center(child: CircularProgressIndicator())
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Nombre: ${userData['nombre'] ?? 'No disponible'} ${userData['apellido'] ?? 'No disponible'}',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Carrera: ${userData['carrera'] ?? 'No disponible'}',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'User ID: ${widget.userId}',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ],
               ),
-            ),
-            SizedBox(height: 20), // Espacio entre el título y los datos
-            Text('Nombre: Juan Pérez'),
-            Text('Correo: juan.perez@example.com'),
-            Text('Edad: 30'),
-            // Agrega más datos según sea necesario
-          ],
-        ),
       ),
     );
   }
 }
-//class InterfazMiPerfil extends State

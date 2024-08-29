@@ -1,75 +1,8 @@
-/* import 'package:flutter/material.dart';
-
-void showCustomMenu(BuildContext context) {
-  showMenu<String>(
-    context: context,
-    position: RelativeRect.fromLTRB(
-      100.0, // X position (ajustar)
-      100.0, // Y position (ajustar)
-      0.0, // Width offset
-      0.0, // Height offset
-    ),
-    items: <PopupMenuEntry<String>>[
-      PopupMenuItem<String>(
-        value: 'profile',
-        child: Row(
-          children: <Widget>[
-            Icon(
-              Icons.person_2_rounded,
-              color: Colors.black,
-              size: 30.0,
-            ), // Icono para 'Mi Perfil'
-            SizedBox(width: 8), // Espacio entre el icono y el texto
-            Text(
-              'Mi Perfil',
-              style: TextStyle(
-                fontFamily: 'SF-Pro-Text',
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-      PopupMenuItem<String>(
-        value: 'logout',
-        child: Row(
-          children: <Widget>[
-            Icon(
-              Icons.logout_rounded,
-              color: Colors.black,
-              size: 30.0,
-            ), // Icono para 'Cerrar Sesión'
-            SizedBox(width: 8), // Espacio entre el icono y el texto
-            Text(
-              'Cerrar sesión',
-              style: TextStyle(
-                  fontFamily: 'SF-Pro-Text',
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
-    ],
-    elevation: 8.0,
-    //color: Color.fromARGB(255, 135, 207, 235),
-  ).then((String? value) {
-    if (value != null) {
-      if (value == 'profile') {
-        // Lógica para 'Mi Perfil'
-      } else if (value == 'logout') {
-        // Lógica para 'Cerrar Sesión'
-      }
-    }
-  });
-}
- */
 import 'package:flutter/material.dart';
 import 'package:modular2/screens/interfazMiPerfil.dart';
 import 'package:modular2/screens/logout.dart';
 
-void showCustomMenu(BuildContext context) {
+void showCustomMenu(BuildContext context, String userId) {
   String selectedItem = '';
 
   showMenu<String>(
@@ -88,12 +21,10 @@ void showCustomMenu(BuildContext context) {
             return Material(
               color: Colors.transparent, // Color del fondo del menú
               child: InkWell(
-                // para manejar los tap's
                 onTap: () {
                   selectedItem = 'profile';
                   Navigator.pop(context, 'profile');
-                  setState(
-                      () {}); // Actualiza el estado para reflejar el cambio
+                  setState(() {}); // Actualiza el estado para reflejar el cambio
                 },
                 splashColor: Colors.blue.withOpacity(0.3), // Color del splash
                 highlightColor:
@@ -139,8 +70,7 @@ void showCustomMenu(BuildContext context) {
                 onTap: () {
                   selectedItem = 'logout';
                   Navigator.pop(context, 'logout');
-                  setState(
-                      () {}); // Actualiza el estado para reflejar el cambio
+                  setState(() {}); // Actualiza el estado para reflejar el cambio
                 },
                 splashColor: Colors.blue.withOpacity(0.3), // Color del splash
                 highlightColor:
@@ -184,7 +114,7 @@ void showCustomMenu(BuildContext context) {
       if (value == 'profile') {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => InterfazMiPerfil()),
+          MaterialPageRoute(builder: (context) => InterfazMiPerfil(userId)), // Pasa el userId aquí
         );
       } else if (value == 'logout') {
         LogoutService().logout(context);

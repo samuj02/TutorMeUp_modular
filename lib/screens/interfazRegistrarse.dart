@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:modular2/screens/customTextField.dart';
-import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Importar Firestore
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:modular2/screens/customTextField.dart';
 
 class PantallaRegistrarse extends StatefulWidget {
   @override
@@ -17,106 +16,110 @@ class _PantallaRegistrarseState extends State<PantallaRegistrarse> {
   final TextEditingController _carreraController = TextEditingController();
   final TextEditingController _telefonoController = TextEditingController();
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   Future<void> _register() async {
-    final response = await http.post(
-      Uri.parse('http://localhost/tutormeup/register.php'),
-      body: {
+    try {
+      // Crear un nuevo documento en la colección "user"
+      DocumentReference docRef = await _firestore.collection('user').add({
         'nombre': _nombreController.text,
         'apellido': _apellidoController.text,
         'email': _emailController.text,
         'password': _passwordController.text,
         'carrera': _carreraController.text,
-        'telefono': _telefonoController.text,
-      },
-    );
+        'telefono': int.parse(_telefonoController.text),
+        'user_id': DateTime.now().millisecondsSinceEpoch, // Generar un ID único basado en el tiempo
+      });
 
-    /* if (response.body == "Se ha registrado exitosamente") { */
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      print(responseData);
-      if (responseData['estado'] == 'exitoso') {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setInt('user_id', responseData['user_id']);
-        // Limpiamos campos:
-        _nombreController.clear();
-        _apellidoController.clear();
-        _emailController.clear();
-        _passwordController.clear();
-        _carreraController.clear();
-        _telefonoController.clear();
+      // Obtener el ID del documento recién creado
+      String userId = docRef.id;
 
-        // Mostrar mensaje de éxito
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Registrado exitosamente. ID: ${responseData['user_id']}',
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 25,
-                  fontFamily: 'SF-Pro-Roneded',
-                  fontWeight: FontWeight.w400),
-              textAlign: TextAlign.center,
-            ),
-            backgroundColor: Color(0xFF35FF69),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-            elevation: 25.0,
-            margin: EdgeInsets.all(12.0),
-            behavior: SnackBarBehavior.floating,
+      // Guardar el ID del usuario en SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_id', userId);
+
+      // Limpiar los campos después del registro exitoso
+      _nombreController.clear();
+      _apellidoController.clear();
+      _emailController.clear();
+      _passwordController.clear();
+      _carreraController.clear();
+      _telefonoController.clear();
+
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Registrado exitosamente. ID: $userId',
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: 25,
+                fontFamily: 'SF-Pro-Rounded',
+                fontWeight: FontWeight.w400),
+            textAlign: TextAlign.center,
           ),
-        );
+          backgroundColor: Color(0xFF35FF69),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          elevation: 25.0,
+          margin: EdgeInsets.all(12.0),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
 
-        // Retrasar unos segundos para que se mire la SnackBar
-        await Future.delayed(Duration(seconds: 3));
+      // Retrasar unos segundos para que se mire la SnackBar
+      await Future.delayed(Duration(seconds: 3));
 
-        // Nos vamos a la screen de inicio.
-        Navigator.pushReplacementNamed(context, '/inicio');
-      } else {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(
-              'Error',
-              style: TextStyle(
-                  fontFamily: 'SF-Pro-Display',
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.w600),
-            ),
-            content: Text(
-              responseData['mensaje'],
+      // Navegar a la pantalla de inicio
+      Navigator.pushReplacementNamed(context, '/inicio');
+    } catch (e) {
+      print('Error: $e');
+      _showErrorDialog('Ocurrió un error al intentar registrar. Inténtelo de nuevo.');
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Error',
+          style: TextStyle(
+              fontFamily: 'SF-Pro-Display',
+              fontSize: 24.0,
+              fontWeight: FontWeight.w600),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(
+              fontFamily: 'SF-Pro-Text',
+              fontSize: 16.0,
+              fontWeight: FontWeight.normal),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'OK',
               style: TextStyle(
                   fontFamily: 'SF-Pro-Text',
                   fontSize: 16.0,
-                  fontWeight: FontWeight.normal),
-              textAlign: TextAlign.center,
+                  fontWeight: FontWeight.bold),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'OK',
-                  style: TextStyle(
-                      fontFamily: 'SF-Pro-Text',
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF004AAD),
-                    foregroundColor: Colors.white,
-                    elevation: 16.0,
-                    shadowColor: Color.fromARGB(128, 0, 0, 0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(color: Color(0xFF3A6CAD)),
-                    )),
-              ),
-            ],
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF004AAD),
+                foregroundColor: Colors.white,
+                elevation: 16.0,
+                shadowColor: Color.fromARGB(128, 0, 0, 0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18.0),
+                  side: BorderSide(color: Color(0xFF3A6CAD)),
+                )),
           ),
-        );
-      }
-    } else {
-      print('Error: ${response.body}');
-    }
+        ],
+      ),
+    );
   }
 
   Widget build(BuildContext context) {
@@ -179,6 +182,7 @@ class _PantallaRegistrarseState extends State<PantallaRegistrarse> {
                   labelText: 'Teléfono',
                   hintText: 'Ingrese su número telefónico',
                   prefixIcon: Icons.phone,
+                  keyboardType: TextInputType.phone,
                 ),
                 SizedBox(height: 40),
                 ElevatedButton(
@@ -212,141 +216,4 @@ class _PantallaRegistrarseState extends State<PantallaRegistrarse> {
       ),
     );
   }
-
-  /* @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nueva Cuenta'),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              buildCustomTextField(
-                  controller: _nombreController,
-                  labelText: 'Nombres(s)',
-                  hintText: 'Ingrese su nombre:',
-                  keyboardType: TextInputType.name,
-                  prefixIcon: Icons.label_important_rounded),
-              SizedBox(height: 20),
-              buildCustomTextField(
-                  controller: _apellidoController,
-                  labelText: 'Apellido',
-                  hintText: 'Ingrese su(s) apellido(s)',
-                  keyboardType: TextInputType.name,
-                  prefixIcon: Icons.label_important_rounded),
-              SizedBox(height: 20),
-              buildCustomTextField(
-                  controller: _emailController,
-                  labelText: 'Correo electrónico',
-                  hintText: 'Ingrese su correo electrónico',
-                  keyboardType: TextInputType.emailAddress,
-                  prefixIcon: Icons.alternate_email_rounded),
-              SizedBox(height: 20),
-              buildCustomTextField(
-                controller: _passwordController,
-                labelText: 'Contraseña',
-                hintText: 'Ingrese su contraseña',
-                prefixIcon: Icons.password_rounded,
-                obscureText: true,
-              ),
-              SizedBox(height: 20),
-              buildCustomTextField(
-                controller: _carreraController,
-                labelText: 'Carrera',
-                hintText: 'Ingrese su carrera universitaria',
-                prefixIcon: Icons.school_rounded,
-              ),
-              SizedBox(height: 20),
-              buildCustomTextField(
-                controller: _telefonoController,
-                labelText: 'Teléfono',
-                hintText: 'Ingrese su número telefónico',
-                prefixIcon: Icons.phone,
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _register,
-                child: Text('Registrarse'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  } */
 }
-
-
-/* import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import '../services/storage_service.dart';
-
-class RegisterPage extends StatefulWidget {
-  @override
-  _RegisterPageState createState() => _RegisterPageState();
-}
-
-class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  Future<void> registerUser() async {
-    final response = await http.post(
-      Uri.parse('http://10.0.2.2/tutormeup/register.php'),
-      body: {
-        'email': _emailController.text,
-        'password': _passwordController.text,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      if (data.containsKey('userId')) {
-        final userId = data['userId'];
-        // Guarda el ID en shared_preferences
-        await StorageService.saveUserId(userId);
-        // Navega a la vista de inicio o perfil
-        Navigator.pushReplacementNamed(context, '/inicio');
-      } else {
-        // Maneja el error
-        print('Error: ${data['error']}');
-      }
-    } else {
-      // Maneja el error
-      print('Error: ${response.statusCode}');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Register')),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            ElevatedButton(
-              onPressed: registerUser,
-              child: Text('Register'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
- */

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Importar Firestore
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PantallaInicioSesion extends StatefulWidget {
@@ -11,180 +10,74 @@ class PantallaInicioSesion extends StatefulWidget {
 class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> _signIn() async {
     try {
-      final response = await http.post(
-        Uri.parse('http://localhost/tutormeup/login.php'),
-        body: {
-          'email': _emailController.text,
-          'password': _passwordController.text,
-        },
-      );
+      // Intentar encontrar un documento en la colección "user" que tenga el mismo email
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('user')
+          .where('email', isEqualTo: _emailController.text)
+          .get();
 
-      print(
-          'Response body: ${response.body}'); // Añadir esta línea para ver la respuesta en la consola
+      if (querySnapshot.docs.isNotEmpty) {
+        // El usuario fue encontrado, ahora verificar la contraseña
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+        String storedPassword = userDoc['password'];
 
-      // Obtenemos la respuesta de PHP
-      // y decodificamos en formato json
-      final responseData = json.decode(response.body);
+        if (storedPassword == _passwordController.text) {
+          // Contraseña correcta, guardar el user_id en SharedPreferences
+          String userId = userDoc.id; // ID del documento como user_id
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('user_id', userId);
 
-      if (responseData['estado'] == 'exitoso') {
-        final int userId = responseData['user_id'];
-
-        //Guardamos el ID logeado
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setInt('user_id', userId);
-
-        Navigator.pushReplacementNamed(context, '/inicio'
-            //MaterialPageRoute(builder: (context) => InicioApp()),
-            );
-      } else if (responseData['estado'] == 'errorIncorrectPass') {
-        // Credenciales incorrectas
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(
-              'Error',
-              style: TextStyle(
-                  fontFamily: 'SF-Pro-Display',
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.w600),
-            ),
-            content: Text(
-              'Usuario y/o contraseña son incorrectos',
-              style: TextStyle(
-                  fontFamily: 'SF-Pro-Text',
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.normal),
-              textAlign: TextAlign.center,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'OK',
-                  style: TextStyle(
-                      fontFamily: 'SF-Pro-Text',
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF004AAD),
-                    foregroundColor: Colors.white,
-                    elevation: 16.0,
-                    shadowColor: Color.fromARGB(128, 0, 0, 0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(color: Color(0xFF3A6CAD)),
-                    )),
-              ),
-            ],
-          ),
-        );
-      } else if (responseData['estado'] == 'errorDatosMal') {
-        // Incorrecto el usuario en este caso el email xd XD
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(
-              'Error',
-              style: TextStyle(
-                  fontFamily: 'SF-Pro-Display',
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.w600),
-            ),
-            content: Text(
-              'Usuario y/o contraseña son incorrectos',
-              style: TextStyle(
-                  fontFamily: 'SF-Pro-Text',
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.normal),
-              textAlign: TextAlign.center,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'OK',
-                  style: TextStyle(
-                      fontFamily: 'SF-Pro-Text',
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF004AAD),
-                    foregroundColor: Colors.white,
-                    elevation: 16.0,
-                    shadowColor: Color.fromARGB(128, 0, 0, 0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(color: Color(0xFF3A6CAD)),
-                    )),
-              ),
-            ],
-          ),
-        );
+          // Navegar a la pantalla de inicio
+          Navigator.pushReplacementNamed(context, '/inicio');
+        } else {
+          _showErrorDialog('Contraseña incorrecta.');
+        }
       } else {
-        // Incorrecto el usuario en este caso el email xd XD
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(
-              'Faltan datos',
-              style: TextStyle(
-                  fontFamily: 'SF-Pro-Display',
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.w600),
-            ),
-            content: Text(
-              'Por favor, ingrese correo y contraseña',
-              style: TextStyle(
-                  fontFamily: 'SF-Pro-Text',
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.normal),
-              textAlign: TextAlign.center,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'OK',
-                  style: TextStyle(
-                      fontFamily: 'SF-Pro-Text',
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF004AAD),
-                    foregroundColor: Colors.white,
-                    elevation: 16.0,
-                    shadowColor: Color.fromARGB(128, 0, 0, 0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(color: Color(0xFF3A6CAD)),
-                    )),
-              ),
-            ],
-          ),
-        );
+        _showErrorDialog('Correo electrónico no encontrado.');
       }
     } catch (e) {
       print('Error: $e');
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Error'),
-          content: Text('Ocurrió un error al intentar iniciar sesión.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
+      _showErrorDialog('Ocurrió un error inesperado. Inténtelo de nuevo.');
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Error',
+          style: TextStyle(
+              fontFamily: 'SF-Pro-Display',
+              fontSize: 24.0,
+              fontWeight: FontWeight.w600),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(
+              fontFamily: 'SF-Pro-Text',
+              fontSize: 16.0,
+              fontWeight: FontWeight.normal),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'OK',
+              style: TextStyle(
+                  fontFamily: 'SF-Pro-Text',
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -208,7 +101,7 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
               Expanded(
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0), //16
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[

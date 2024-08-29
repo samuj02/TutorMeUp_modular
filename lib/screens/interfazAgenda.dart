@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Importar Firestore
 
 class AgendaScreen extends StatefulWidget {
-  final int? userId;
+  final String? userId; // Cambié a String ya que los IDs de Firestore suelen ser cadenas
 
   AgendaScreen({this.userId});
 
@@ -12,7 +11,7 @@ class AgendaScreen extends StatefulWidget {
 }
 
 class _AgendaScreenState extends State<AgendaScreen> {
-  List _tutorias = [];
+  List<DocumentSnapshot> _tutorias = [];
 
   @override
   void initState() {
@@ -21,32 +20,34 @@ class _AgendaScreenState extends State<AgendaScreen> {
   }
 
   Future<void> _fetchTutorias() async {
-    final response = await http.get(Uri.parse(
-        'http://189.203.149.247/tutormeup/obtener_tutorias.php?user_id=${widget.userId}'));
+    try {
+      // Obtener todas las tutorías de la colección 'tutorias' en Firestore
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('tutorias')
+          .get();
 
-    if (response.statusCode == 200) {
       setState(() {
-        _tutorias = json.decode(response.body);
+        _tutorias = querySnapshot.docs;
       });
-    } else {
-      throw Exception('Failed to load tutorias');
+    } catch (e) {
+      print('Error fetching tutorias: $e');
     }
   }
 
   Future<void> _registerTutoria(String titulo, String descripcion) async {
-    final response = await http.post(
-      Uri.parse('http://189.203.149.247/tutormeup/registrar_tutoria.php'),
-      body: {
-        'user_id': widget.userId.toString(),
+    try {
+      // Registrar una nueva tutoría en Firestore
+      await FirebaseFirestore.instance.collection('tutorias').add({
+        'user_id': widget.userId,
         'titulo': titulo,
         'descripcion': descripcion,
-      },
-    );
+        'timestamp': FieldValue.serverTimestamp(),
+      });
 
-    if (response.body == 'Tutoria registrada') {
-      _fetchTutorias(); // Refresh the list
-    } else {
-      print('Error: ${response.body}');
+      // Actualizar la lista de tutorías después de registrar una nueva
+      _fetchTutorias();
+    } catch (e) {
+      print('Error registering tutoria: $e');
     }
   }
 
@@ -79,14 +80,11 @@ class _AgendaScreenState extends State<AgendaScreen> {
                     textAlign: TextAlign.center,
                   ))
                 : ListView.builder(
-              itemCount: _tutorias.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_tutorias[index]['titulo']),
-                  subtitle: Text(_tutorias[index]['descripcion']),
-                );
-              },
-            ),
+                    itemCount: _tutorias.length,
+                    itemBuilder: (context, index) {
+                      return _buildTutoriaCard(_tutorias[index]);
+                    },
+                  ),
           ),
           Padding(
             padding: const EdgeInsets.all(25.0),
@@ -115,6 +113,58 @@ class _AgendaScreenState extends State<AgendaScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTutoriaCard(DocumentSnapshot tutoria) {
+    return Card(
+      elevation: 5,
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              tutoria['titulo'],
+              style: TextStyle(
+                fontFamily: 'SF-Pro-Rounded',
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF3A6CAD),
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              tutoria['descripcion'],
+              style: TextStyle(
+                fontFamily: 'SF-Pro-Text',
+                fontSize: 18,
+                fontWeight: FontWeight.normal,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  'Publicado por: ${tutoria['user_id']}',
+                  style: TextStyle(
+                    fontFamily: 'SF-Pro-Text',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
