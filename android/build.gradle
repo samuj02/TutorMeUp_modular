@@ -1,7 +1,21 @@
+buildscript {
+    ext {
+        kotlin_version = '1.7.10' // Actualiza a una versión más reciente de Kotlin
+    }
+    repositories {
+        google() // Asegúrate de que este repositorio esté aquí
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.1.0'
+        classpath 'com.google.gms:google-services:4.3.15' // Añade esta línea
+    }
+}
+
 allprojects {
     repositories {
         google()
-        mavenCentral()
+        mavenCentral()  
     }
 }
 

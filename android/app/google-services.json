@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "406721053257",
+    "project_id": "modular2-fa7a0",
+    "storage_bucket": "modular2-fa7a0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:406721053257:android:c0f2a11a726fea8e237598",
+        "android_client_info": {
+          "package_name": "com.example.modular2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKlntc6S7J0WYPNj8CiSqrUe-O8-oeSl4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
