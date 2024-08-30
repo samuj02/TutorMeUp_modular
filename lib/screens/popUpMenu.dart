@@ -114,7 +114,7 @@ void showCustomMenu(BuildContext context, String userId) {
       if (value == 'profile') {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => InterfazMiPerfil(userId)), // Pasa el userId aquí
+          MaterialPageRoute(builder: (context) => InterfazMiPerfil(userId: 'user_id')), // Pasa el userId aquí
         );
       } else if (value == 'logout') {
         LogoutService().logout(context);

@@ -35,7 +35,7 @@ class TutorMeUpApp extends StatelessWidget {
         '/inicio': (context) => InicioApp('user_id'), 
         '/tutorias': (context) => InterfazTutorias(),
         '/myTutorias': (context) => InterfazMyTutorias(),
-        '/miPerfil': (context) => InterfazMiPerfil('user_id'),
+        '/miPerfil': (context) => InterfazMiPerfil(userId: 'user_id'),
         '/agenda': (context) => AgendaScreen(),
         '/mapa': (context) => MapaScreen(),
         '/inteligenciaA': (context) => InterfazIA(),
