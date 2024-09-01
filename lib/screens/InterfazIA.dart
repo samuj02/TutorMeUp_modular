@@ -32,6 +32,13 @@ class _InterfazIAState extends State<InterfazIA> {
                         _buildQuestion("¿Cuál es tu materia favorita?", "favorite_subject"),
                         _buildQuestion("¿En qué materia te sientes más débil?", "weak_subject"),
                         _buildQuestion("¿Cuántas horas al día dedicas al estudio?", "study_hours"),
+                        _buildQuestion("¿Qué nivel de confianza tienes en tus habilidades matemáticas?", "math_confidence"),
+                        _buildQuestion("¿Cómo calificarías tu comprensión de los conceptos básicos de física?", "physics_understanding"),
+                        _buildQuestion("¿Tienes experiencia previa en programación?", "programming_experience"),
+                        _buildQuestion("¿Te sientes cómodo resolviendo problemas lógicos y algoritmos?", "logic_comfort"),
+                        _buildQuestion("¿Qué tanto disfrutas de las tareas relacionadas con cálculos matemáticos?", "math_enjoyment"),
+                        _buildQuestion("¿Cuál es tu experiencia previa en física experimental?", "physics_experience"),
+                        _buildQuestion("¿Te sientes cómodo trabajando con lenguajes de programación?", "programming_comfort"),
                         // Puedes agregar más preguntas aquí
                         SizedBox(height: 20),
                         ElevatedButton(
@@ -103,7 +110,7 @@ class _InterfazIAState extends State<InterfazIA> {
     // Aquí iría la llamada a la API real que devolvería las recomendaciones.
     // Esta es solo una simulación con datos ficticios.
     setState(() {
-      _recommendedSubjects = ["Matemáticas", "Física", "Química"];
+      _recommendedSubjects = ["Matemáticas", "Física", "Programación"];
       _isLoading = false;
     });
   }

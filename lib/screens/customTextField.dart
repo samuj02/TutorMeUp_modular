@@ -7,10 +7,16 @@ TextField buildCustomTextField({
   TextInputType keyboardType = TextInputType.text,
   IconData? prefixIcon,
   bool obscureText = false,
+  void Function()? onIconPressed,
+  int? maxLines,
+  int? minLines,
 }) {
   return TextField(
     controller: controller,
     keyboardType: keyboardType,
+    obscureText: obscureText && (maxLines == null || maxLines == 1),
+    maxLines: obscureText ? 1 : maxLines,
+    minLines: obscureText ? 1 : minLines,
     decoration: InputDecoration(
       labelText: labelText,
       labelStyle: TextStyle(
@@ -26,6 +32,19 @@ TextField buildCustomTextField({
               prefixIcon,
               size: 35.0,
               color: Color(0xFF004AAD),
+            )
+          : null,
+      suffixIcon: onIconPressed != null
+          ? IconButton(
+              padding: const EdgeInsetsDirectional.only(end: 12.0),
+              icon: Icon(
+                obscureText
+                    ? Icons.visibility_rounded
+                    : Icons.visibility_off_rounded,
+                size: 35,
+                color: Color(0xFF004AAD),
+              ),
+              onPressed: onIconPressed,
             )
           : null,
       contentPadding: EdgeInsets.only(left: 30.0, top: 24.0, bottom: 20.0),

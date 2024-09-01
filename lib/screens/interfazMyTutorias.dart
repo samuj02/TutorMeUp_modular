@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:modular2/screens/InterfazRegistrarTutoria.dart';
 
 class InterfazMyTutorias extends StatefulWidget {
   final String? userId; // Cambié a String para usar IDs de Firestore
@@ -32,23 +33,6 @@ class _InterfazMyTutoriasState extends State<InterfazMyTutorias> {
       });
     } catch (e) {
       print('Error fetching tutorias: $e');
-    }
-  }
-
-  Future<void> _registrarMiTutoria(String titulo, String descripcion) async {
-    try {
-      // Registrar una nueva tutoría en Firestore
-      await FirebaseFirestore.instance.collection('tutorias').add({
-        'user_id': widget.userId,
-        'titulo': titulo,
-        'descripcion': descripcion,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-
-      // Actualizar la lista de tutorías después de registrar una nueva
-      _fetchMyTutorias();
-    } catch (e) {
-      print('Error registering tutoria: $e');
     }
   }
 
@@ -91,7 +75,7 @@ class _InterfazMyTutoriasState extends State<InterfazMyTutorias> {
             padding: const EdgeInsets.all(25.0),
             child: ElevatedButton(
               onPressed: () {
-                _showRegisterDialog();
+                _navigateToRegistrarTutoria();
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF004BAD),
@@ -170,46 +154,12 @@ class _InterfazMyTutoriasState extends State<InterfazMyTutorias> {
     );
   }
 
-  void _showRegisterDialog() {
-    final tituloController = TextEditingController();
-    final descripcionController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Registrar Tutoria'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: tituloController,
-                decoration: InputDecoration(labelText: 'Título'),
-              ),
-              TextField(
-                controller: descripcionController,
-                decoration: InputDecoration(labelText: 'Descripción'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _registrarMiTutoria(
-                    tituloController.text, descripcionController.text);
-                Navigator.of(context).pop();
-              },
-              child: Text('Registrar'),
-            ),
-          ],
-        );
-      },
+  void _navigateToRegistrarTutoria() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RegistrarTutoria(widget.userId),
+      ),
     );
   }
 }

@@ -9,6 +9,7 @@ import 'package:modular2/screens/interfazAgenda.dart';
 import 'package:modular2/screens/inicioApp.dart';
 import 'package:modular2/screens/interfazMapa.dart';
 import 'package:modular2/screens/InterfazIA.dart';
+import 'package:modular2/screens/InterfazRegistrarTutoria.dart';
 
 void main() async {
   // Asegúrate de que los Widgets de Flutter estén inicializados antes de Firebase
@@ -39,6 +40,8 @@ class TutorMeUpApp extends StatelessWidget {
         '/agenda': (context) => AgendaScreen(),
         '/mapa': (context) => MapaScreen(),
         '/inteligenciaA': (context) => InterfazIA(),
+        '/RegistrarTutoria': (context) => RegistrarTutoria(),
+
       },
     );
   }

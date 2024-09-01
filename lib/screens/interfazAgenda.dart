@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Importar Firestore
+import 'package:modular2/screens/interfazTutorias.dart'; // Asegúrate de que esta importación sea correcta según la estructura de tu proyecto
 
 class AgendaScreen extends StatefulWidget {
   final String? userId; // Cambié a String ya que los IDs de Firestore suelen ser cadenas
@@ -31,23 +32,6 @@ class _AgendaScreenState extends State<AgendaScreen> {
       });
     } catch (e) {
       print('Error fetching tutorias: $e');
-    }
-  }
-
-  Future<void> _registerTutoria(String titulo, String descripcion) async {
-    try {
-      // Registrar una nueva tutoría en Firestore
-      await FirebaseFirestore.instance.collection('tutorias').add({
-        'user_id': widget.userId,
-        'titulo': titulo,
-        'descripcion': descripcion,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-
-      // Actualizar la lista de tutorías después de registrar una nueva
-      _fetchTutorias();
-    } catch (e) {
-      print('Error registering tutoria: $e');
     }
   }
 
@@ -90,7 +74,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
             padding: const EdgeInsets.all(25.0),
             child: ElevatedButton(
               onPressed: () {
-                _showRegisterDialog();
+                _navigateToBuscarTutorias();
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF3A6CAD),
@@ -103,11 +87,11 @@ class _AgendaScreenState extends State<AgendaScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    Icons.add_circle_rounded,
+                    Icons.search,
                     size: 30,
                   ),
                   SizedBox(width: 8),
-                  Text('Publicar tutoría'),
+                  Text('Buscar Tutorías'),
                 ],
               ),
             ),
@@ -118,6 +102,11 @@ class _AgendaScreenState extends State<AgendaScreen> {
   }
 
   Widget _buildTutoriaCard(DocumentSnapshot tutoria) {
+    // Asegúrate de que los campos existen y no son nulos
+    final String titulo = tutoria['titulo'] ?? 'Sin título';
+    final String descripcion = tutoria['descripcion'] ?? 'Sin descripción';
+    final String userId = tutoria['user_id'] ?? 'Usuario desconocido';
+
     return Card(
       elevation: 5,
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
@@ -130,7 +119,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              tutoria['titulo'],
+              titulo,
               style: TextStyle(
                 fontFamily: 'SF-Pro-Rounded',
                 fontSize: 24,
@@ -140,7 +129,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
             ),
             SizedBox(height: 8),
             Text(
-              tutoria['descripcion'],
+              descripcion,
               style: TextStyle(
                 fontFamily: 'SF-Pro-Text',
                 fontSize: 18,
@@ -153,7 +142,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'Publicado por: ${tutoria['user_id']}',
+                  'Publicado por: $userId',
                   style: TextStyle(
                     fontFamily: 'SF-Pro-Text',
                     fontSize: 14,
@@ -169,46 +158,12 @@ class _AgendaScreenState extends State<AgendaScreen> {
     );
   }
 
-  void _showRegisterDialog() {
-    final tituloController = TextEditingController();
-    final descripcionController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Registrar Tutoria'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: tituloController,
-                decoration: InputDecoration(labelText: 'Título'),
-              ),
-              TextField(
-                controller: descripcionController,
-                decoration: InputDecoration(labelText: 'Descripción'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _registerTutoria(
-                    tituloController.text, descripcionController.text);
-                Navigator.of(context).pop();
-              },
-              child: Text('Registrar'),
-            ),
-          ],
-        );
-      },
+  void _navigateToBuscarTutorias() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => InterfazTutorias(widget.userId), // Parámetro posicional
+      ),
     );
   }
 }
