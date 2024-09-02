@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'interfazAgenda.dart';
 
 class InterfazTutorias extends StatefulWidget {
   final String? userId; // Cambié a String para usar IDs de Firestore
@@ -21,7 +22,6 @@ class _InterfazTutoriasState extends State<InterfazTutorias> {
 
   Future<void> _fetchTutorias() async {
     try {
-      // Consultar todas las tutorías en Firestore
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('tutorias')
           .get();
@@ -34,51 +34,101 @@ class _InterfazTutoriasState extends State<InterfazTutorias> {
     }
   }
 
-  Future<void> _registerTutoria(String titulo, String descripcion) async {
+  Future<void> _agendarTutoria(DocumentSnapshot tutoria) async {
     try {
-      // Registrar una nueva tutoría en Firestore
-      await FirebaseFirestore.instance.collection('tutorias').add({
+      await FirebaseFirestore.instance
+          .collection('agendas')
+          .add({
         'user_id': widget.userId,
-        'titulo': titulo,
-        'descripcion': descripcion,
+        'tutoria_id': tutoria.id,
+        'titulo': tutoria['titulo'],
+        'descripcion': tutoria['descripcion'],
         'timestamp': FieldValue.serverTimestamp(),
       });
-
-      // Actualizar la lista de tutorías después de registrar una nueva
-      _fetchTutorias();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('¡Tutoría agendada con éxito!')),
+      );
     } catch (e) {
-      print('Error registering tutoria: $e');
+      print('Error al agendar la tutoría: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al agendar la tutoría')),
+      );
     }
+  }
+
+  void _mostrarDetallesTutoria(BuildContext context, DocumentSnapshot tutoria) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(tutoria['titulo']),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Descripción:",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(tutoria['descripcion']),
+              SizedBox(height: 16),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Cancelar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: Text("Agendar"),
+              onPressed: () async {
+                await _agendarTutoria(tutoria);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tutorias'),
+        title: Text(
+          'Todas las Tutorías',
+          style: TextStyle(
+              fontFamily: 'SF-Pro-Rounded',
+              color: Colors.white,
+              fontSize: 30,
+              fontWeight: FontWeight.w800),
+        ),
+        backgroundColor: Color(0xFF0082AD),
       ),
       body: Column(
         children: [
           Expanded(
             child: _tutorias.isEmpty
                 ? Center(
-                    child: Text('No hay tutorías publicadas.'),
-                  )
+                    child: Text(
+                    '¡No hay tutorías disponibles! 🤔',
+                    style: TextStyle(
+                        fontFamily: 'SF-Pro-Rounded',
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0082AD)),
+                    textAlign: TextAlign.center,
+                  ))
                 : ListView.builder(
                     itemCount: _tutorias.length,
                     itemBuilder: (context, index) {
                       return _buildTutoriaCard(_tutorias[index]);
                     },
                   ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                _showRegisterDialog();
-              },
-              child: Text('Publicar Tutoria'),
-            ),
           ),
         ],
       ),
@@ -92,91 +142,37 @@ class _InterfazTutoriasState extends State<InterfazTutorias> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              tutoria['titulo'],
-              style: TextStyle(
-                fontFamily: 'SF-Pro-Rounded',
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF3A6CAD),
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              tutoria['descripcion'],
-              style: TextStyle(
-                fontFamily: 'SF-Pro-Text',
-                fontSize: 18,
-                fontWeight: FontWeight.normal,
-                color: Colors.black87,
-              ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'Publicado por: ${tutoria['user_id']}',
-                  style: TextStyle(
-                    fontFamily: 'SF-Pro-Text',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showRegisterDialog() {
-    final tituloController = TextEditingController();
-    final descripcionController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Registrar Tutoria'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+      child: InkWell(
+        onTap: () => _mostrarDetallesTutoria(context, tutoria),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextField(
-                controller: tituloController,
-                decoration: InputDecoration(labelText: 'Título'),
+              Text(
+                tutoria['titulo'],
+                style: TextStyle(
+                  fontFamily: 'SF-Pro-Rounded',
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0082AD),
+                ),
               ),
-              TextField(
-                controller: descripcionController,
-                decoration: InputDecoration(labelText: 'Descripción'),
+              SizedBox(height: 8),
+              Text(
+                tutoria['descripcion'],
+                style: TextStyle(
+                  fontFamily: 'SF-Pro-Text',
+                  fontSize: 18,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.black87,
+                ),
               ),
+              SizedBox(height: 10),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _registerTutoria(
-                    tituloController.text, descripcionController.text);
-                Navigator.of(context).pop();
-              },
-              child: Text('Registrar'),
-            ),
-          ],
-        );
-      },
+        ),
+      ),
     );
   }
 }

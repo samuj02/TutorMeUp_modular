@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Importar Firestore
-import 'package:modular2/screens/interfazTutorias.dart'; // Asegúrate de que esta importación sea correcta según la estructura de tu proyecto
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'interfazTutorias.dart'; // Asegúrate de importar la interfazTutorias.dart
 
 class AgendaScreen extends StatefulWidget {
   final String? userId; // Cambié a String ya que los IDs de Firestore suelen ser cadenas
@@ -12,27 +12,74 @@ class AgendaScreen extends StatefulWidget {
 }
 
 class _AgendaScreenState extends State<AgendaScreen> {
-  List<DocumentSnapshot> _tutorias = [];
+  List<DocumentSnapshot> _agendadas = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchTutorias();
+    _fetchAgendadas();
   }
 
-  Future<void> _fetchTutorias() async {
+  Future<void> _fetchAgendadas() async {
     try {
-      // Obtener todas las tutorías de la colección 'tutorias' en Firestore
+      // Obtener las tutorías agendadas para el usuario actual en Firestore
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('tutorias')
+          .collection('agendas')
+          .where('user_id', isEqualTo: widget.userId)
           .get();
 
       setState(() {
-        _tutorias = querySnapshot.docs;
+        _agendadas = querySnapshot.docs;
       });
     } catch (e) {
-      print('Error fetching tutorias: $e');
+      print('Error fetching agendadas: $e');
     }
+  }
+
+  Future<void> _cancelarTutoria(String tutoriaId) async {
+    try {
+      // Eliminar la tutoría agendada de Firestore
+      await FirebaseFirestore.instance.collection('agendas').doc(tutoriaId).delete();
+      // Volver a cargar las tutorías agendadas
+      _fetchAgendadas();
+    } catch (e) {
+      print('Error canceling tutoria: $e');
+    }
+  }
+
+  void _mostrarDialogoCancelar(String tutoriaId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('¿Estás seguro que quieres cancelar la tutoría?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('No'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _cancelarTutoria(tutoriaId);
+                Navigator.of(context).pop();
+              },
+              child: Text('Sí'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _navigateToBuscarTutorias() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => InterfazTutorias(widget.userId),
+      ),
+    );
   }
 
   @override
@@ -52,10 +99,10 @@ class _AgendaScreenState extends State<AgendaScreen> {
       body: Column(
         children: [
           Expanded(
-            child: _tutorias.isEmpty
+            child: _agendadas.isEmpty
                 ? Center(
                     child: Text(
-                    '¡Aún no tienes ninguna tutoría publicada! 🤔',
+                    '¡No tienes tutorías agendadas! 🤔',
                     style: TextStyle(
                         fontFamily: 'SF-Pro-Rounded',
                         fontSize: 30,
@@ -64,35 +111,26 @@ class _AgendaScreenState extends State<AgendaScreen> {
                     textAlign: TextAlign.center,
                   ))
                 : ListView.builder(
-                    itemCount: _tutorias.length,
+                    itemCount: _agendadas.length,
                     itemBuilder: (context, index) {
-                      return _buildTutoriaCard(_tutorias[index]);
+                      return _buildAgendadaCard(_agendadas[index]);
                     },
                   ),
           ),
           Padding(
-            padding: const EdgeInsets.all(25.0),
+            padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
-              onPressed: () {
-                _navigateToBuscarTutorias();
-              },
+              onPressed: _navigateToBuscarTutorias,
+              child: Text('Buscar Tutoría'),
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF3A6CAD),
-                  foregroundColor: Colors.white,
-                  textStyle: TextStyle(
-                      fontSize: 25,
-                      fontFamily: 'SF-Pro-Text',
-                      fontWeight: FontWeight.w600)),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.search,
-                    size: 30,
-                  ),
-                  SizedBox(width: 8),
-                  Text('Buscar Tutorías'),
-                ],
+                backgroundColor: Color(0xFF3A6CAD),
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                textStyle: TextStyle(
+                  fontFamily: 'SF-Pro-Text',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -101,11 +139,10 @@ class _AgendaScreenState extends State<AgendaScreen> {
     );
   }
 
-  Widget _buildTutoriaCard(DocumentSnapshot tutoria) {
-    // Asegúrate de que los campos existen y no son nulos
-    final String titulo = tutoria['titulo'] ?? 'Sin título';
-    final String descripcion = tutoria['descripcion'] ?? 'Sin descripción';
-    final String userId = tutoria['user_id'] ?? 'Usuario desconocido';
+  Widget _buildAgendadaCard(DocumentSnapshot agendada) {
+    final String titulo = agendada['titulo'] ?? 'Sin título';
+    final String descripcion = agendada['descripcion'] ?? 'Sin descripción';
+    final String tutoriaId = agendada.id;
 
     return Card(
       elevation: 5,
@@ -138,31 +175,33 @@ class _AgendaScreenState extends State<AgendaScreen> {
               ),
             ),
             SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'Publicado por: $userId',
-                  style: TextStyle(
+            Text(
+              'Fecha y hora: ${agendada['timestamp'].toDate().toString()}',
+              style: TextStyle(
+                fontFamily: 'SF-Pro-Text',
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: () => _mostrarDialogoCancelar(tutoriaId),
+                child: Text('Cancelar'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  textStyle: TextStyle(
                     fontFamily: 'SF-Pro-Text',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ],
+              ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _navigateToBuscarTutorias() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => InterfazTutorias(widget.userId), // Parámetro posicional
       ),
     );
   }
