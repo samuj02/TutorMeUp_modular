@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'interfazAgenda.dart';
 
 class InterfazTutorias extends StatefulWidget {
-  final String? userId; // Cambié a String para usar IDs de Firestore
+  final String? userId;
 
   InterfazTutorias([this.userId]);
 
@@ -34,24 +33,23 @@ class _InterfazTutoriasState extends State<InterfazTutorias> {
     }
   }
 
-  Future<void> _agendarTutoria(DocumentSnapshot tutoria) async {
+  Future<void> _solicitarTutoria(DocumentSnapshot tutoria) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('agendas')
-          .add({
+      await FirebaseFirestore.instance.collection('solicitudes').add({
         'user_id': widget.userId,
         'tutoria_id': tutoria.id,
+        'tutor_id': tutoria['user_id'], // ID del tutor
         'titulo': tutoria['titulo'],
         'descripcion': tutoria['descripcion'],
         'timestamp': FieldValue.serverTimestamp(),
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('¡Tutoría agendada con éxito!')),
+        SnackBar(content: Text('¡Solicitud enviada con éxito!')),
       );
     } catch (e) {
-      print('Error al agendar la tutoría: $e');
+      print('Error al enviar la solicitud: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al agendar la tutoría')),
+        SnackBar(content: Text('Error al enviar la solicitud')),
       );
     }
   }
@@ -83,9 +81,9 @@ class _InterfazTutoriasState extends State<InterfazTutorias> {
               },
             ),
             ElevatedButton(
-              child: Text("Agendar"),
+              child: Text("Solicitar"),
               onPressed: () async {
-                await _agendarTutoria(tutoria);
+                await _solicitarTutoria(tutoria);
                 Navigator.of(context).pop();
               },
             ),

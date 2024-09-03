@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:modular2/main.dart';
 import 'interfazMyTutorias.dart';
 import 'interfazTutorias.dart';
 import 'interfazAgenda.dart';
 import 'popUpMenu.dart';
 import 'InterfazIA.dart';
 import 'interfazMapa.dart';
+import 'interfazSolicitudesP.dart';
 
 class InicioApp extends StatelessWidget {
   final String userId;
@@ -63,13 +65,16 @@ class InicioApp extends StatelessWidget {
                 );
               }),
               _buildGridButton(context, 'Solicitudes Pendientes',
-                  Icons.safety_divider, Color(0xFF00ADA1), () {
+                Icons.safety_divider, Color(0xFF00ADA1), () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => AgendaScreen(userId: userId)),
+                    builder: (context) => InterfazSolicitudesP(tutorId: userId), // Aquí asegúrate de usar 'tutorId'
+                  ),
                 );
               }),
+
+
               _buildGridButton(
                   context, 'Mis Tutorias', Icons.book, Color(0xFF004BAD), () {
                 Navigator.push(
@@ -83,7 +88,7 @@ class InicioApp extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => MapaScreen()),
+                      builder: (context) => InterfazMapa()),
                 );
               }),
               _buildGridButton(
