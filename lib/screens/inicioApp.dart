@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:modular2/main.dart';
 import 'interfazMyTutorias.dart';
 import 'interfazTutorias.dart';
 import 'interfazAgenda.dart';
@@ -34,7 +33,7 @@ class InicioApp extends StatelessWidget {
                 tooltip: 'Mi perfil',
                 color: Colors.black,
                 onPressed: () {
-                  showCustomMenu(context, userId);
+                  showCustomMenu(context);
                 },
               ),
             )
@@ -65,16 +64,15 @@ class InicioApp extends StatelessWidget {
                 );
               }),
               _buildGridButton(context, 'Solicitudes Pendientes',
-                Icons.safety_divider, Color(0xFF00ADA1), () {
+                  Icons.safety_divider, Color(0xFF00ADA1), () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => InterfazSolicitudesP(tutorId: userId), // Aquí asegúrate de usar 'tutorId'
+                    builder: (context) => InterfazSolicitudesP(
+                        tutorId: userId), // Aquí asegúrate de usar 'tutorId'
                   ),
                 );
               }),
-
-
               _buildGridButton(
                   context, 'Mis Tutorias', Icons.book, Color(0xFF004BAD), () {
                 Navigator.push(
@@ -83,20 +81,18 @@ class InicioApp extends StatelessWidget {
                       builder: (context) => InterfazMyTutorias(userId)),
                 );
               }),
-              _buildGridButton(
-                  context, 'Mapa', Icons.map, Color(0xFF004BAD), () {
+              _buildGridButton(context, 'Mapa', Icons.map, Color(0xFF004BAD),
+                  () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => InterfazMapa()),
+                  MaterialPageRoute(builder: (context) => InterfazMapa()),
                 );
               }),
               _buildGridButton(
                   context, 'Examen IA', Icons.book, Color(0xFF004BAD), () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => InterfazIA()),
+                  MaterialPageRoute(builder: (context) => InterfazIA()),
                 );
               }),
             ],

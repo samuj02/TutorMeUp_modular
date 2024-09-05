@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Importa Firebase Authentication
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:modular2/services/storage_service.dart'; // Importa Firebase Authentication
 
 class LogoutService {
   Future<void> logout(BuildContext context) async {
     try {
       // Cierra la sesión de Firebase
       await FirebaseAuth.instance.signOut();
+
+      // Borramos los datos del usuario guardados
+      await StorageService.clearUserId();
+      await StorageService.clearUserData();
 
       // Una vez damos click al Cerrar sesión, nos vamos a la página principal.
       Navigator.pushNamedAndRemoveUntil(

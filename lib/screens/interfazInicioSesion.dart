@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Importar Firestore
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:modular2/services/storage_service.dart';
 
 class PantallaInicioSesion extends StatefulWidget {
   @override
@@ -28,8 +28,10 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
         if (storedPassword == _passwordController.text) {
           // Contraseña correcta, guardar el user_id en SharedPreferences
           String userId = userDoc.id; // ID del documento como user_id
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('user_id', userId);
+          await StorageService.saveUserId(userId);
+          print("Inicie sesión: $userId");
+          /* SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('user_id', userId); */
 
           // Navegar a la pantalla de inicio
           Navigator.pushReplacementNamed(context, '/inicio');

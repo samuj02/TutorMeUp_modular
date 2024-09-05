@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:modular2/screens/interfazMiPerfil.dart';
 import 'package:modular2/screens/logout.dart';
 
-void showCustomMenu(BuildContext context, String userId) {
+void showCustomMenu(BuildContext context) {
   String selectedItem = '';
 
   showMenu<String>(
@@ -24,7 +24,8 @@ void showCustomMenu(BuildContext context, String userId) {
                 onTap: () {
                   selectedItem = 'profile';
                   Navigator.pop(context, 'profile');
-                  setState(() {}); // Actualiza el estado para reflejar el cambio
+                  setState(
+                      () {}); // Actualiza el estado para reflejar el cambio
                 },
                 splashColor: Colors.blue.withOpacity(0.3), // Color del splash
                 highlightColor:
@@ -70,7 +71,8 @@ void showCustomMenu(BuildContext context, String userId) {
                 onTap: () {
                   selectedItem = 'logout';
                   Navigator.pop(context, 'logout');
-                  setState(() {}); // Actualiza el estado para reflejar el cambio
+                  setState(
+                      () {}); // Actualiza el estado para reflejar el cambio
                 },
                 splashColor: Colors.blue.withOpacity(0.3), // Color del splash
                 highlightColor:
@@ -114,7 +116,8 @@ void showCustomMenu(BuildContext context, String userId) {
       if (value == 'profile') {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => InterfazMiPerfil(userId: 'user_id')), // Pasa el userId aquí
+          MaterialPageRoute(
+              builder: (context) => InterfazMiPerfil()), // Pasa el userId aquí
         );
       } else if (value == 'logout') {
         LogoutService().logout(context);

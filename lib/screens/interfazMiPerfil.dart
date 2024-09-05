@@ -4,11 +4,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:modular2/services/storage_service.dart';
+import 'widgets.dart';
 
 class InterfazMiPerfil extends StatefulWidget {
-  final String userId;
-  InterfazMiPerfil({required this.userId});
+  InterfazMiPerfil();
 
   @override
   State<InterfazMiPerfil> createState() => _InterfazMiPerfil();
@@ -26,10 +26,26 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
   final TextEditingController _carreraController = TextEditingController();
   final TextEditingController _telefonoController = TextEditingController();
 
+  late String _docId;
+
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   @override
   void initState() {
     super.initState();
-    _fetchUserData();
+    _getDocumentId();
+    //_fetchUserData();
+  }
+
+  Future<void> _getDocumentId() async {
+    String? storedUserId = await StorageService.getUserId();
+    if (storedUserId != null) {
+      setState(() {
+        _docId = storedUserId;
+        _fetchUserData();
+      });
+    }
   }
 
   Future<void> _fetchUserData() async {
@@ -38,16 +54,16 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
     });
 
     try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('user')
-          .doc(widget.userId)
-          .get();
+      DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('user').doc(_docId).get();
 
       if (userDoc.exists) {
+        print("Usuario con id: $_docId");
         setState(() {
           userData = userDoc.data() as Map<String, dynamic>;
           _isLoading = false;
         });
+        print(userData);
       } else {
         throw Exception('Usuario no encontrado');
       }
@@ -74,35 +90,31 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
 
   Future<void> _cargarImagen(File image) async {
     try {
-      String fileName = 'profile_pictures/${widget.userId}.jpg';
-      Reference storageRef = FirebaseStorage.instance.ref().child(fileName);
-      UploadTask uploadTask = storageRef.putFile(image);
+      // Definimos la referenca del archivo en Firebase Storage
+      final storageRef = _storage.ref().child('profile_pictures/$_docId.jpg');
 
-      TaskSnapshot snapshot = await uploadTask;
-      String downloadUrl = await snapshot.ref.getDownloadURL();
+      // Subimos el archivo
+      final uploadTask = storageRef.putFile(image);
+      final snapshot = await uploadTask;
 
-      await FirebaseFirestore.instance
+      // Obtenemos la url de deacarga del archivo subido
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      // Guardamos la url en Firestore asociado a ese user
+      await _firestore
           .collection('user')
-          .doc(widget.userId)
+          .doc(_docId)
           .update({'imagen_perfil': downloadUrl});
+
+      print("Imagen subida y URL en Cloud Storage: $downloadUrl");
 
       setState(() {
         userData['imagen_perfil'] = downloadUrl;
       });
+      print(userData['imagen_perfil']);
     } catch (e) {
       print('Error al cargar la imagen: $e');
     }
-  }
-
-  void _enableEditing() {
-    setState(() {
-      _isEditing = true;
-      _nombreController.text = userData['nombre'] ?? '';
-      _apellidoController.text = userData['apellido'] ?? '';
-      _emailController.text = userData['email'] ?? '';
-      _carreraController.text = userData['carrera'] ?? '';
-      _telefonoController.text = userData['telefono'] ?? '';
-    });
   }
 
   void _saveChanges() async {
@@ -117,7 +129,7 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
     try {
       await FirebaseFirestore.instance
           .collection('user')
-          .doc(widget.userId)
+          .doc(_docId)
           .update(updatedData);
 
       setState(() {
@@ -129,37 +141,6 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
     } catch (e) {
       print('Error al actualizar los datos en Firestore: $e');
     }
-  }
-
-  Widget _buildTextField(
-      IconData icon, String label, TextEditingController controller) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.black),
-        SizedBox(width: 10),
-        Expanded(
-          child: TextField(
-            controller: controller,
-            decoration: InputDecoration(labelText: label),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUserDataRow(IconData icon, String label, String? value) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.black),
-        SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            '$label: $value',
-            style: TextStyle(fontSize: 16),
-          ),
-        ),
-      ],
-    );
   }
 
   @override
@@ -227,20 +208,20 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
                                             radius: 80.0,
                                             backgroundImage: userData[
                                                         'imagen_perfil'] !=
-                                                    null
+                                                    ''
                                                 ? CachedNetworkImageProvider(
                                                     userData['imagen_perfil']
                                                         as String,
                                                   )
                                                 : null,
-                                            child: userData['imagen_perfil'] ==
-                                                    null
-                                                ? Icon(
-                                                    Icons.person_2_rounded,
-                                                    size: 70.0,
-                                                    color: Colors.black,
-                                                  )
-                                                : null,
+                                            child:
+                                                userData['imagen_perfil'] == ''
+                                                    ? Icon(
+                                                        Icons.person_2_rounded,
+                                                        size: 70.0,
+                                                        color: Colors.black,
+                                                      )
+                                                    : null,
                                           ),
                                           Positioned(
                                             bottom: 0.0,
@@ -313,21 +294,21 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
                                     _isEditing
                                         ? Column(
                                             children: [
-                                              _buildTextField(
+                                              inputRow(
                                                   Icons.person_2_rounded,
                                                   "Nombre(s)",
                                                   _nombreController),
-                                              _buildTextField(
+                                              inputRow(
                                                   Icons.person_2_outlined,
                                                   "Apellido(s)",
                                                   _apellidoController),
-                                              _buildTextField(Icons.email_rounded,
+                                              inputRow(Icons.email_rounded,
                                                   "Correo", _emailController),
-                                              _buildTextField(
+                                              inputRow(
                                                   Icons.school_rounded,
                                                   "Carrera",
                                                   _carreraController),
-                                              _buildTextField(
+                                              inputRow(
                                                   Icons.phone_rounded,
                                                   "Teléfono",
                                                   _telefonoController),
@@ -352,8 +333,8 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
                                                             backgroundColor:
                                                                 Color(
                                                                     0xFFFFE74C),
-                                                            shadowColor: Colors
-                                                                .black,
+                                                            shadowColor:
+                                                                Colors.black,
                                                             elevation: 20.0,
                                                             foregroundColor:
                                                                 Colors.black),
@@ -370,8 +351,8 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
                                                             backgroundColor:
                                                                 Color(
                                                                     0xFFFF934F),
-                                                            shadowColor: Colors
-                                                                .black,
+                                                            shadowColor:
+                                                                Colors.black,
                                                             elevation: 20.0,
                                                             foregroundColor:
                                                                 Colors.white),
@@ -390,30 +371,31 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
                                           )
                                         : Column(
                                             children: [
-                                              _buildUserDataRow(
+                                              outPutRow(
                                                   Icons.person_2_rounded,
                                                   "Nombre(s)",
                                                   userData['nombre']
                                                       as String?),
-                                              _buildUserDataRow(
+                                              outPutRow(
                                                   Icons.person_2_outlined,
                                                   "Apellido(s)",
                                                   userData['apellido']
                                                       as String?),
-                                              _buildUserDataRow(
+                                              outPutRow(
                                                   Icons.email_rounded,
                                                   "Correo",
                                                   userData['email'] as String?),
-                                              _buildUserDataRow(
+                                              outPutRow(
                                                   Icons.school_rounded,
                                                   "Carrera",
                                                   userData['carrera']
                                                       as String?),
-                                              _buildUserDataRow(
-                                                  Icons.phone_rounded,
-                                                  "Teléfono",
-                                                  userData['telefono']
-                                                      as String?),
+                                              outPutRow(
+                                                Icons.phone_rounded,
+                                                "Teléfono",
+                                                userData['telefono']
+                                                    ?.toString(),
+                                              ),
                                               SizedBox(height: 5.0),
                                               Row(
                                                 mainAxisAlignment:
@@ -423,35 +405,38 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
                                                     onPressed: () {
                                                       setState(() {
                                                         _isEditing = true;
-                                                        _nombreController.text =
-                                                            userData['nombre']
+                                                        _nombreController
+                                                            .text = userData[
+                                                                    'nombre']
                                                                 as String? ??
-                                                                '';
-                                                        _apellidoController.text =
-                                                            userData['apellido']
+                                                            '';
+                                                        _apellidoController
+                                                            .text = userData[
+                                                                    'apellido']
                                                                 as String? ??
-                                                                '';
-                                                        _emailController.text =
-                                                            userData['email']
+                                                            '';
+                                                        _emailController
+                                                            .text = userData[
+                                                                    'email']
                                                                 as String? ??
-                                                                '';
-                                                        _carreraController.text =
-                                                            userData['carrera']
+                                                            '';
+                                                        _carreraController
+                                                            .text = userData[
+                                                                    'carrera']
                                                                 as String? ??
-                                                                '';
+                                                            '';
                                                         _telefonoController
-                                                                .text =
-                                                            userData['telefono']
-                                                                as String? ??
-                                                                '';
+                                                            .text = userData[
+                                                                    'telefono']
+                                                                ?.toString() ??
+                                                            '';
                                                       });
                                                     },
                                                     style: ElevatedButton
                                                         .styleFrom(
                                                       backgroundColor:
                                                           Color(0xFF3D75E4),
-                                                      shadowColor: Colors
-                                                          .black,
+                                                      shadowColor: Colors.black,
                                                       elevation: 20.0,
                                                       foregroundColor:
                                                           Colors.white,
@@ -470,11 +455,11 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
                                               ),
                                             ],
                                           ),
-                                ],
-                              ),
+                                  ],
+                                ),
                               ),
                             ],
-                        ),
+                          ),
                   ),
                 ],
               ),

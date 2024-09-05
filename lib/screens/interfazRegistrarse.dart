@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Importar Firestore
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:modular2/screens/customTextField.dart';
+import 'package:modular2/services/storage_service.dart';
 
 class PantallaRegistrarse extends StatefulWidget {
   @override
@@ -28,15 +28,19 @@ class _PantallaRegistrarseState extends State<PantallaRegistrarse> {
         'password': _passwordController.text,
         'carrera': _carreraController.text,
         'telefono': int.parse(_telefonoController.text),
-        'user_id': DateTime.now().millisecondsSinceEpoch, // Generar un ID único basado en el tiempo
+        'imagen_perfil': '',
+        'user_id': DateTime.now()
+            .millisecondsSinceEpoch, // Generar un ID único basado en el tiempo
       });
 
       // Obtener el ID del documento recién creado
       String userId = docRef.id;
 
       // Guardar el ID del usuario en SharedPreferences
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('user_id', userId);
+      await StorageService.saveUserId(userId);
+      print("Me registré con: $userId");
+      /* SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_id', userId); */
 
       // Limpiar los campos después del registro exitoso
       _nombreController.clear();
@@ -74,7 +78,8 @@ class _PantallaRegistrarseState extends State<PantallaRegistrarse> {
       Navigator.pushReplacementNamed(context, '/inicio');
     } catch (e) {
       print('Error: $e');
-      _showErrorDialog('Ocurrió un error al intentar registrar. Inténtelo de nuevo.');
+      _showErrorDialog(
+          'Ocurrió un error al intentar registrar. Inténtelo de nuevo.');
     }
   }
 

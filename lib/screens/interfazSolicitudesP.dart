@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'interfazAgenda.dart';
 
 class InterfazSolicitudesP extends StatefulWidget {
   final String? tutorId;
@@ -47,7 +46,10 @@ class _InterfazSolicitudesPState extends State<InterfazSolicitudesP> {
       });
 
       // Eliminar la solicitud de la colección 'solicitudes'
-      await FirebaseFirestore.instance.collection('solicitudes').doc(solicitud.id).delete();
+      await FirebaseFirestore.instance
+          .collection('solicitudes')
+          .doc(solicitud.id)
+          .delete();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('¡Tutoría aceptada con éxito!')),
@@ -66,11 +68,13 @@ class _InterfazSolicitudesPState extends State<InterfazSolicitudesP> {
   Future<void> _rechazarSolicitud(DocumentSnapshot solicitud) async {
     try {
       // Eliminar la solicitud de la colección 'solicitudes'
-      await FirebaseFirestore.instance.collection('solicitudes').doc(solicitud.id).delete();
+      await FirebaseFirestore.instance
+          .collection('solicitudes')
+          .doc(solicitud.id)
+          .delete();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Solicitud rechazada')),
-
       );
 
       // Recargar solicitudes

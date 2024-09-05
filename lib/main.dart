@@ -11,6 +11,7 @@ import 'package:modular2/screens/interfazMapa.dart';
 import 'package:modular2/screens/InterfazIA.dart';
 import 'package:modular2/screens/InterfazRegistrarTutoria.dart';
 import 'package:modular2/screens/interfazSolicitudesP.dart';
+import 'package:modular2/services/storage_service.dart';
 
 void main() async {
   // Asegúrate de que los Widgets de Flutter estén inicializados antes de Firebase
@@ -18,6 +19,9 @@ void main() async {
 
   // Inicializar Firebase
   await Firebase.initializeApp();
+
+  // Borrar el dato del ID del documento del user
+  await StorageService.clearUserId();
 
   runApp(TutorMeUpApp());
 }
@@ -34,10 +38,10 @@ class TutorMeUpApp extends StatelessWidget {
         '/home': (context) => HomePage(),
         '/inicioSesion': (context) => PantallaInicioSesion(),
         '/registrarse': (context) => PantallaRegistrarse(),
-        '/inicio': (context) => InicioApp('user_id'), 
+        '/inicio': (context) => InicioApp('user_id'),
         '/tutorias': (context) => InterfazTutorias(),
         '/myTutorias': (context) => InterfazMyTutorias(),
-        '/miPerfil': (context) => InterfazMiPerfil(userId: 'user_id'),
+        '/miPerfil': (context) => InterfazMiPerfil(),
         '/agenda': (context) => AgendaScreen(),
         '/mapa': (context) => InterfazMapa(),
         '/inteligenciaA': (context) => InterfazIA(),
