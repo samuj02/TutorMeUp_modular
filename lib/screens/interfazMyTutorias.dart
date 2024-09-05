@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:modular2/screens/InterfazRegistrarTutoria.dart';
+import 'package:modular2/services/storage_service.dart';
 
 class InterfazMyTutorias extends StatefulWidget {
   final String? userId; // Cambié a String para usar IDs de Firestore
@@ -22,10 +23,12 @@ class _InterfazMyTutoriasState extends State<InterfazMyTutorias> {
 
   Future<void> _fetchMyTutorias() async {
     try {
+      // Obtenemos el id del doc del usuario que ingresó
+      String? storedUserId = await StorageService.getUserId();
       // Consultar las tutorías del usuario actual en Firestore
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('tutorias')
-          .where('user_id', isEqualTo: widget.userId)
+          .where('user_id', isEqualTo: storedUserId)
           .get();
 
       setState(() {

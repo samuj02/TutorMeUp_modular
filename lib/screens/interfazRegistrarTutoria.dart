@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:modular2/screens/customTextField.dart';
 import 'package:modular2/screens/interfazAddChooseMateria.dart';
+import 'package:modular2/services/storage_service.dart';
 
 class RegistrarTutoria extends StatefulWidget {
-  final String? userId; // Cambié int? a String? porque los IDs en Firestore suelen ser cadenas
+  final String?
+      userId; // Cambié int? a String? porque los IDs en Firestore suelen ser cadenas
   RegistrarTutoria([this.userId]);
 
   @override
@@ -26,41 +28,24 @@ class _RegistrarTutoriaState extends State<RegistrarTutoria> {
         ),
       );
     } else {
+      // Obtenemos el id del documento del usuario, para referenciar la tutoria
+      String? storedUserId = await StorageService.getUserId();
       // Preparar los datos de la tutoría para guardarlos en Firestore
       Map<String, dynamic> datosTutoria = {
-        'user_id': widget.userId,
+        'user_id': storedUserId,
         'titulo': _nombreController.text,
         'aula': _aulaController.text,
         'descripcion': _descripcionController.text,
         'timestamp': Timestamp.now(), // Agrega la fecha de creación
       };
 
-      try {
-        // Añadir la tutoría a la colección "tutorias" en Firestore
-        DocumentReference tutoriaRef = await FirebaseFirestore.instance
-            .collection('tutorias')
-            .add(datosTutoria);
-
-        // Obtener el ID de la tutoría recién creada
-        String tutoriaId = tutoriaRef.id;
-
-        // Agregar el ID de la tutoría a los datos para pasarlos a la siguiente pantalla
-        datosTutoria['tutoria_id'] = tutoriaId;
-
-        // Navegar a la pantalla de agregar/escoger materia
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AddChooseMateria(datosTutoria),
-          ),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al registrar la tutoría: $e'),
-          ),
-        );
-      }
+      // Navegar a la pantalla de agregar/escoger materia
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddChooseMateria(datosTutoria),
+        ),
+      );
     }
   }
 
@@ -131,8 +116,8 @@ class _RegistrarTutoriaState extends State<RegistrarTutoria> {
                       backgroundColor: Color(0xFF004AAD), // Fondo del botón
                       shadowColor: Colors.black,
                       elevation: 8.0,
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 15),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                       textStyle: TextStyle(
                         fontFamily: 'SF-Pro-Rounded',
                         fontSize: 20.0,

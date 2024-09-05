@@ -54,10 +54,10 @@ class _PantallaRegistrarseState extends State<PantallaRegistrarse> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Registrado exitosamente. ID: $userId',
+            'Registrado exitosamente.',
             style: TextStyle(
                 color: Colors.black,
-                fontSize: 25,
+                fontSize: 22,
                 fontFamily: 'SF-Pro-Rounded',
                 fontWeight: FontWeight.w400),
             textAlign: TextAlign.center,
