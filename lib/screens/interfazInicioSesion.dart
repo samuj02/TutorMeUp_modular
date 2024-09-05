@@ -14,26 +14,18 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
 
   Future<void> _signIn() async {
     try {
-      // Intentar encontrar un documento en la colección "user" que tenga el mismo email
       QuerySnapshot querySnapshot = await _firestore
           .collection('user')
           .where('email', isEqualTo: _emailController.text)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        // El usuario fue encontrado, ahora verificar la contraseña
         DocumentSnapshot userDoc = querySnapshot.docs.first;
         String storedPassword = userDoc['password'];
 
         if (storedPassword == _passwordController.text) {
-          // Contraseña correcta, guardar el user_id en SharedPreferences
-          String userId = userDoc.id; // ID del documento como user_id
+          String userId = userDoc.id;
           await StorageService.saveUserId(userId);
-          print("Inicie sesión: $userId");
-          /* SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('user_id', userId); */
-
-          // Navegar a la pantalla de inicio
           Navigator.pushReplacementNamed(context, '/inicio');
         } else {
           _showErrorDialog('Contraseña incorrecta.');
@@ -42,7 +34,6 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
         _showErrorDialog('Correo electrónico no encontrado.');
       }
     } catch (e) {
-      print('Error: $e');
       _showErrorDialog('Ocurrió un error inesperado. Inténtelo de nuevo.');
     }
   }
@@ -88,32 +79,31 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          // Imagen de fondo
           Image.asset(
             'assets/images/fondoInicioSesion.png',
             fit: BoxFit.cover,
           ),
-          // Contenido encima de la imagen
-          Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-              ),
-              Expanded(
-                child: Center(
-                  child: Padding(
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  AppBar(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                  ),
+                  Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
+                        SizedBox(height: 100), // Añadido espacio superior
                         Text(
                           'Iniciar Sesión',
                           style: TextStyle(
                             fontFamily: 'SF-Pro-Display',
                             fontSize: 40.0,
                             fontWeight: FontWeight.w900,
-                            color: Colors.black, // Color del texto
+                            color: Colors.black,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -139,20 +129,14 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
                             contentPadding: EdgeInsets.only(
                                 left: 30.0, top: 24.0, bottom: 20.0),
                             floatingLabelBehavior: FloatingLabelBehavior.always,
-
-                            // Borde del TextField
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
-
-                            // Borde cuando no está enfocado
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
                                   color: Color.fromARGB(128, 0, 0, 0)),
                               borderRadius: BorderRadius.circular(10.0),
                             ),
-
-                            // Borde cuando está enfocado
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Color(0xFF004AAD)),
                               borderRadius: BorderRadius.circular(10.0),
@@ -163,7 +147,7 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
                               fontSize: 20.0,
                               fontWeight: FontWeight.w600),
                         ),
-                        SizedBox(height: 20.0), //20.0
+                        SizedBox(height: 20.0),
                         TextField(
                           controller: _passwordController,
                           obscureText: true,
@@ -185,20 +169,14 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
                             contentPadding: EdgeInsets.only(
                                 left: 30.0, top: 24.0, bottom: 20.0),
                             floatingLabelBehavior: FloatingLabelBehavior.always,
-
-                            // Borde del TextField
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
-
-                            // Borde cuando no está enfocado
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
                                   color: Color.fromARGB(128, 0, 0, 0)),
                               borderRadius: BorderRadius.circular(10.0),
                             ),
-
-                            // Borde cuando está enfocado
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Color(0xFF004AAD)),
                               borderRadius: BorderRadius.circular(10.0),
@@ -225,21 +203,20 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
                                     blurRadius: 3.0,
                                     color: Color.fromARGB(128, 0, 0, 0),
                                   )
-                                ] // Color del texto del botón
-                                ),
+                                ]),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFF004AAD),
-                            shadowColor: Colors.black, // Color del botón
-                            elevation: 20.0, // Color del texto del botón
+                            shadowColor: Colors.black,
+                            elevation: 20.0,
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ],
       ),
