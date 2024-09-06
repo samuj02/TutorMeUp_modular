@@ -5,9 +5,7 @@ import 'package:modular2/screens/interfazAddChooseMateria.dart';
 import 'package:modular2/services/storage_service.dart';
 
 class RegistrarTutoria extends StatefulWidget {
-  final String?
-      userId; // Cambié int? a String? porque los IDs en Firestore suelen ser cadenas
-  RegistrarTutoria([this.userId]);
+  RegistrarTutoria();
 
   @override
   _RegistrarTutoriaState createState() => _RegistrarTutoriaState();
@@ -24,7 +22,24 @@ class _RegistrarTutoriaState extends State<RegistrarTutoria> {
         _descripcionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Por favor, complete todos los campos.'),
+          content: Text(
+            'Por favor, complete todos los campos.',
+            style: TextStyle(
+              color: Colors.black, // Color del texto
+              fontSize: 18.0, // Tamaño del texto
+              fontWeight: FontWeight.w700, // Grosor del texto
+              fontFamily: 'SF-Pro-Rounded', // Fuente personalizada
+            ),
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Color(0xFFFFCA00), // Color de fondo de la SnackBar
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20), // Bordes redondeados
+          ),
+          elevation: 10, // Sombra para darle un efecto de profundidad
+          margin: EdgeInsets.all(16.0), // Espaciado alrededor de la SnackBar
+          behavior:
+              SnackBarBehavior.floating, // Hace que la SnackBar esté flotante
         ),
       );
     } else {
@@ -75,30 +90,30 @@ class _RegistrarTutoriaState extends State<RegistrarTutoria> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   buildCustomTextField(
-                    controller: _nombreController,
-                    labelText: 'Título',
-                    hintText: 'Ingrese el título de la tutoría:',
-                    keyboardType: TextInputType.name,
-                    prefixIcon: Icons.title_rounded,
-                  ),
+                      controller: _nombreController,
+                      labelText: 'Título',
+                      hintText: 'Ingrese el título de la tutoría:',
+                      keyboardType: TextInputType.name,
+                      prefixIcon: Icons.title_rounded,
+                      colorTheme: Color(0xFF004BAD)),
                   SizedBox(height: 20),
                   buildCustomTextField(
-                    controller: _aulaController,
-                    labelText: 'Aula',
-                    hintText: 'Ingrese el aula:',
-                    keyboardType: TextInputType.name,
-                    prefixIcon: Icons.meeting_room,
-                  ),
+                      controller: _aulaController,
+                      labelText: 'Aula',
+                      hintText: 'Ingrese el aula:',
+                      keyboardType: TextInputType.name,
+                      prefixIcon: Icons.meeting_room,
+                      colorTheme: Color(0xFF004BAD)),
                   SizedBox(height: 20),
                   buildCustomTextField(
-                    controller: _descripcionController,
-                    labelText: 'Descripción',
-                    hintText: 'Describa su tutoría:',
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    minLines: 4,
-                    prefixIcon: Icons.description_rounded,
-                  ),
+                      controller: _descripcionController,
+                      labelText: 'Descripción',
+                      hintText: 'Describa su tutoría:',
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      minLines: 4,
+                      prefixIcon: Icons.description_rounded,
+                      colorTheme: Color(0xFF004BAD)),
                   SizedBox(height: 40),
                   ElevatedButton(
                     onPressed: _continuarRegistro,

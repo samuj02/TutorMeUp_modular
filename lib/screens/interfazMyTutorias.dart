@@ -4,9 +4,7 @@ import 'package:modular2/screens/InterfazRegistrarTutoria.dart';
 import 'package:modular2/services/storage_service.dart';
 
 class InterfazMyTutorias extends StatefulWidget {
-  final String? userId; // Cambié a String para usar IDs de Firestore
-
-  InterfazMyTutorias([this.userId]);
+  InterfazMyTutorias();
 
   @override
   _InterfazMyTutoriasState createState() => _InterfazMyTutoriasState();
@@ -161,7 +159,7 @@ class _InterfazMyTutoriasState extends State<InterfazMyTutorias> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RegistrarTutoria(widget.userId),
+        builder: (context) => RegistrarTutoria(),
       ),
     );
   }

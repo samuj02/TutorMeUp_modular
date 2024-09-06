@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Importar Firestore
 import 'package:modular2/services/storage_service.dart';
+import 'package:modular2/services/validaciones.dart';
 
 class PantallaInicioSesion extends StatefulWidget {
   @override
@@ -11,35 +12,52 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  bool _ocultarPassword = true;
+  bool _continueRegister = false;
 
   Future<void> _signIn() async {
     try {
-      // Intentar encontrar un documento en la colección "user" que tenga el mismo email
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('user')
-          .where('email', isEqualTo: _emailController.text)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        // El usuario fue encontrado, ahora verificar la contraseña
-        DocumentSnapshot userDoc = querySnapshot.docs.first;
-        String storedPassword = userDoc['password'];
-
-        if (storedPassword == _passwordController.text) {
-          // Contraseña correcta, guardar el user_id en SharedPreferences
-          String userId = userDoc.id; // ID del documento como user_id
-          await StorageService.saveUserId(userId);
-          print("Inicie sesión: $userId");
-          /* SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('user_id', userId); */
-
-          // Navegar a la pantalla de inicio
-          Navigator.pushReplacementNamed(context, '/inicio');
+      // Validamos si hay campos vacios
+      if (_emailController.text.isNotEmpty &&
+          _passwordController.text.isNotEmpty) {
+        if (!isValidEmail(_emailController.text)) {
+          _showErrorDialog("Formato de correo electrónico inválido.");
+          return;
         } else {
-          _showErrorDialog('Contraseña incorrecta.');
+          _continueRegister = true;
         }
       } else {
-        _showErrorDialog('Correo electrónico no encontrado.');
+        _showErrorDialog("Por favor, llene todos los campos.");
+      }
+      if (_continueRegister) {
+        // Intentar encontrar un documento en la colección "user" que tenga el mismo email
+        QuerySnapshot querySnapshot = await _firestore
+            .collection('user')
+            .where('email', isEqualTo: _emailController.text)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          // El usuario fue encontrado, ahora verificar la contraseña
+          DocumentSnapshot userDoc = querySnapshot.docs.first;
+          String storedPassword = userDoc['password'];
+
+          if (storedPassword == _passwordController.text) {
+            // Contraseña correcta, guardar el user_id en SharedPreferences
+            String userId = userDoc.id; // ID del documento como user_id
+            await StorageService.saveUserId(userId);
+            print("Inicie sesión: $userId");
+            /* SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setString('user_id', userId); */
+
+            // Navegar a la pantalla de inicio
+            Navigator.pushReplacementNamed(context, '/inicio');
+          } else {
+            _showErrorDialog('Contraseña incorrecta.');
+          }
+        } else {
+          print("Email not founded.");
+          _showErrorDialog('Correo electrónico no encontrado.');
+        }
       }
     } catch (e) {
       print('Error: $e');
@@ -62,8 +80,8 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
           message,
           style: TextStyle(
               fontFamily: 'SF-Pro-Text',
-              fontSize: 16.0,
-              fontWeight: FontWeight.normal),
+              fontSize: 20.0,
+              fontWeight: FontWeight.w500),
           textAlign: TextAlign.center,
         ),
         actions: [
@@ -76,6 +94,15 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold),
             ),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF004AAD),
+                foregroundColor: Colors.white,
+                elevation: 16.0,
+                shadowColor: Color.fromARGB(128, 0, 0, 0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18.0),
+                  side: BorderSide(color: Color(0xFF3A6CAD)),
+                )),
           ),
         ],
       ),
@@ -166,7 +193,7 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
                         SizedBox(height: 20.0), //20.0
                         TextField(
                           controller: _passwordController,
-                          obscureText: true,
+                          obscureText: _ocultarPassword,
                           decoration: InputDecoration(
                             labelText: 'Contraseña',
                             labelStyle: TextStyle(
@@ -182,6 +209,25 @@ class _PantallaInicioSesionState extends State<PantallaInicioSesion> {
                               size: 35.0,
                               color: Color(0xFF004AAD),
                             ),
+                            suffixIcon: IconButton(
+                                padding:
+                                    const EdgeInsetsDirectional.only(end: 12.0),
+                                onPressed: () {
+                                  setState(() {
+                                    _ocultarPassword = !_ocultarPassword;
+                                  });
+                                },
+                                icon: _ocultarPassword
+                                    ? const Icon(
+                                        Icons.visibility_rounded,
+                                        size: 35.0,
+                                        color: Color(0xFF004AAD),
+                                      )
+                                    : const Icon(
+                                        Icons.visibility_off_rounded,
+                                        size: 35.0,
+                                        color: Color(0xFF004AAD),
+                                      )),
                             contentPadding: EdgeInsets.only(
                                 left: 30.0, top: 24.0, bottom: 20.0),
                             floatingLabelBehavior: FloatingLabelBehavior.always,
