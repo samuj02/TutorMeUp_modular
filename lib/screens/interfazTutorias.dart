@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:modular2/services/storage_service.dart';
 
 class InterfazTutorias extends StatefulWidget {
   final String? userId;
@@ -21,9 +22,8 @@ class _InterfazTutoriasState extends State<InterfazTutorias> {
 
   Future<void> _fetchTutorias() async {
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('tutorias')
-          .get();
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('tutorias').get();
 
       setState(() {
         _tutorias = querySnapshot.docs;
@@ -34,9 +34,11 @@ class _InterfazTutoriasState extends State<InterfazTutorias> {
   }
 
   Future<void> _solicitarTutoria(DocumentSnapshot tutoria) async {
+    //Obtenemos el id del tutor/usuario
+    String? userIdStoraged = await StorageService.getUserId();
     try {
       await FirebaseFirestore.instance.collection('solicitudes').add({
-        'user_id': widget.userId,
+        'user_id': userIdStoraged,
         'tutoria_id': tutoria.id,
         'tutor_id': tutoria['user_id'], // ID del tutor
         'titulo': tutoria['titulo'],
@@ -75,13 +77,25 @@ class _InterfazTutoriasState extends State<InterfazTutorias> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text("Cancelar"),
+              child: Text("Cancelar",
+                  style: TextStyle(
+                      fontFamily: 'SF-Pro-Text', fontWeight: FontWeight.w600)),
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             ElevatedButton(
-              child: Text("Solicitar"),
+              child: Text("Solicitar",
+                  style: TextStyle(
+                      fontFamily: 'SF-Pro-Text', fontWeight: FontWeight.w600)),
+              style: TextButton.styleFrom(
+                backgroundColor: Color(0xFFFFB400),
+                foregroundColor: Colors.white,
+              ),
               onPressed: () async {
                 await _solicitarTutoria(tutoria);
                 Navigator.of(context).pop();

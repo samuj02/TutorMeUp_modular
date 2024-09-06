@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:modular2/services/storage_service.dart';
 
 class InterfazSolicitudesP extends StatefulWidget {
   final String? tutorId;
@@ -20,10 +21,12 @@ class _InterfazSolicitudesPState extends State<InterfazSolicitudesP> {
   }
 
   Future<void> _fetchSolicitudes() async {
+    //Obtenemos el id del tutor/usuario
+    String? tutorIdStoraged = await StorageService.getUserId();
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('solicitudes')
-          .where('tutor_id', isEqualTo: widget.tutorId)
+          .where('tutor_id', isEqualTo: tutorIdStoraged)
           .get();
 
       setState(() {
@@ -99,7 +102,7 @@ class _InterfazSolicitudesPState extends State<InterfazSolicitudesP> {
               fontSize: 30,
               fontWeight: FontWeight.w800),
         ),
-        backgroundColor: Color(0xFF0082AD),
+        backgroundColor: Color(0xFF00ADA1),
       ),
       body: Column(
         children: [
@@ -112,7 +115,7 @@ class _InterfazSolicitudesPState extends State<InterfazSolicitudesP> {
                         fontFamily: 'SF-Pro-Rounded',
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0082AD)),
+                        color: Color(0xFF00ADA1)),
                     textAlign: TextAlign.center,
                   ))
                 : ListView.builder(
@@ -167,14 +170,28 @@ class _InterfazSolicitudesPState extends State<InterfazSolicitudesP> {
               children: [
                 TextButton(
                   onPressed: () => _rechazarSolicitud(solicitud),
-                  child: Text('Rechazar'),
+                  child: Text(
+                    'Rechazar',
+                    style: TextStyle(
+                        fontFamily: 'SF-Pro-Text', fontWeight: FontWeight.w600),
+                  ),
                   style: TextButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xFFFB000D),
+                    foregroundColor: Colors.white,
                   ),
                 ),
+                SizedBox(width: 15.0),
                 ElevatedButton(
                   onPressed: () => _aceptarSolicitud(solicitud),
-                  child: Text('Aceptar'),
+                  child: Text(
+                    'Aceptar',
+                    style: TextStyle(
+                        fontFamily: 'SF-Pro-Text', fontWeight: FontWeight.w600),
+                  ),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Color(0xFF14D800),
+                    foregroundColor: Colors.white,
+                  ),
                 ),
               ],
             ),
