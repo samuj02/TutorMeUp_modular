@@ -105,8 +105,7 @@ class _AddChooseMateriaState extends State<AddChooseMateria> {
       Navigator.pop(context);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-            builder: (context) => InterfazMyTutorias(datosTutoria['user_id'])),
+        MaterialPageRoute(builder: (context) => InterfazMyTutorias()),
       );
     } catch (e) {
       print("Error al registrar la tutoría: $e");

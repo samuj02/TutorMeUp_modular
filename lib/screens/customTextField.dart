@@ -10,6 +10,7 @@ TextField buildCustomTextField({
   void Function()? onIconPressed,
   int? maxLines,
   int? minLines,
+  Color? colorTheme,
 }) {
   return TextField(
     controller: controller,
@@ -23,7 +24,7 @@ TextField buildCustomTextField({
           fontFamily: 'SF-Pro-Text',
           fontSize: 20.0,
           fontWeight: FontWeight.w900,
-          color: Color(0xFF004AAD)),
+          color: colorTheme),
       hintText: hintText,
       filled: true,
       fillColor: Colors.transparent,
@@ -31,7 +32,7 @@ TextField buildCustomTextField({
           ? Icon(
               prefixIcon,
               size: 35.0,
-              color: Color(0xFF004AAD),
+              color: colorTheme,
             )
           : null,
       suffixIcon: onIconPressed != null
@@ -42,7 +43,7 @@ TextField buildCustomTextField({
                     ? Icons.visibility_rounded
                     : Icons.visibility_off_rounded,
                 size: 35,
-                color: Color(0xFF004AAD),
+                color: colorTheme,
               ),
               onPressed: onIconPressed,
             )

@@ -77,8 +77,7 @@ class InicioApp extends StatelessWidget {
                   context, 'Mis Tutorias', Icons.book, Color(0xFF004BAD), () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => InterfazMyTutorias(userId)),
+                  MaterialPageRoute(builder: (context) => InterfazMyTutorias()),
                 );
               }),
               _buildGridButton(context, 'Mapa', Icons.map, Color(0xFF004BAD),
