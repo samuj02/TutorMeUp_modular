@@ -129,87 +129,121 @@ class _InterfazMyTutoriasState extends State<InterfazMyTutorias> {
   }
 
   Widget _buildTutoriaCard(DocumentSnapshot tutoria) {
-    return Card(
-      elevation: 5,
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              tutoria['titulo'],
-              style: TextStyle(
-                fontFamily: 'SF-Pro-Rounded',
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF3A6CAD),
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              tutoria['descripcion'],
-              style: TextStyle(
-                fontFamily: 'SF-Pro-Text',
-                fontSize: 18,
-                fontWeight: FontWeight.normal,
-                color: Colors.black87,
-              ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'Horario: ${tutoria['timestamp'].toDate().toString()}',
-                  style: TextStyle(
-                    fontFamily: 'SF-Pro-Text',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    _modifyTutoria(tutoria);
-                  },
-                  child: Text(
-                    'Modificar',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    _confirmDeleteTutoria(tutoria);
-                  },
-                  child: Text(
-                    'Cancelar',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.red,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+  return FutureBuilder<QuerySnapshot>(
+    future: FirebaseFirestore.instance
+        .collection('horarios')
+        .where('materia_id', isEqualTo: tutoria['materia_id'])
+        .limit(1)
+        .get(), // The correct call here returns a QuerySnapshot
+    builder: (context, snapshot) {
+      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+        return Center(child: CircularProgressIndicator());
+      }
+
+      var horario = snapshot.data!.docs.first; // Get the first document from the query snapshot
+      String diaSemana = horario['dia_semana'] ?? 'Día no disponible';
+      String horaInicio = horario['hora_inicio'] ?? 'Hora no disponible';
+      String horaFin = horario['hora_fin'] ?? 'Hora no disponible';
+
+      return Card(
+        elevation: 5,
+        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
         ),
-      ),
-    );
-  }
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                tutoria['titulo'],
+                style: TextStyle(
+                  fontFamily: 'SF-Pro-Rounded',
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF3A6CAD),
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                tutoria['descripcion'],
+                style: TextStyle(
+                  fontFamily: 'SF-Pro-Text',
+                  fontSize: 18,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Aula: ${tutoria['aula']}',
+                style: TextStyle(
+                  fontFamily: 'SF-Pro-Text',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Día: $diaSemana',
+                style: TextStyle(
+                  fontFamily: 'SF-Pro-Text',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              Text(
+                'Horario: $horaInicio a $horaFin',
+                style: TextStyle(
+                  fontFamily: 'SF-Pro-Text',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      _modifyTutoria(tutoria);
+                    },
+                    child: Text(
+                      'Modificar',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      _confirmDeleteTutoria(tutoria);
+                    },
+                    child: Text(
+                      'Cancelar',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+
 
   void _confirmDeleteTutoria(DocumentSnapshot tutoria) {
     showDialog(
