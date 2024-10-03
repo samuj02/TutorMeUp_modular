@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:modular2/services/storage_service.dart';
+import 'package:TutorMeUp/services/storage_service.dart';
 
 class InterfazTutorias extends StatefulWidget {
   final String? userId;

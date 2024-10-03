@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:modular2/services/storage_service.dart'; // Importa Firebase Authentication
+import 'package:TutorMeUp/services/storage_service.dart'; // Importa Firebase Authentication
 
 class LogoutService {
   Future<void> logout(BuildContext context) async {

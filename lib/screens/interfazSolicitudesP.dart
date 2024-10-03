@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:modular2/services/storage_service.dart';
+import 'package:TutorMeUp/services/storage_service.dart';
 
 class InterfazSolicitudesP extends StatefulWidget {
   final String? tutorId;
@@ -35,6 +35,22 @@ class _InterfazSolicitudesPState extends State<InterfazSolicitudesP> {
     } catch (e) {
       print('Error fetching solicitudes: $e');
     }
+  }
+
+  Future<String?> _obtenerNombreUsuario(String userId) async {
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('user')
+          .doc(userId)
+          .get();
+
+      if (userSnapshot.exists) {
+        return userSnapshot['nombre'];  // Aquí asumimos que el campo es "nombre"
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+    return null;
   }
 
   Future<void> _aceptarSolicitud(DocumentSnapshot solicitud) async {
@@ -121,7 +137,21 @@ class _InterfazSolicitudesPState extends State<InterfazSolicitudesP> {
                 : ListView.builder(
                     itemCount: _solicitudes.length,
                     itemBuilder: (context, index) {
-                      return _buildSolicitudCard(_solicitudes[index]);
+                      return FutureBuilder<String?>(
+                        future: _obtenerNombreUsuario(
+                            _solicitudes[index]['user_id']),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error al cargar el nombre');
+                          } else {
+                            return _buildSolicitudCard(
+                                _solicitudes[index], snapshot.data);
+                          }
+                        },
+                      );
                     },
                   ),
           ),
@@ -130,9 +160,10 @@ class _InterfazSolicitudesPState extends State<InterfazSolicitudesP> {
     );
   }
 
-  Widget _buildSolicitudCard(DocumentSnapshot solicitud) {
+  Widget _buildSolicitudCard(DocumentSnapshot solicitud, String? nombreUsuario) {
     final String titulo = solicitud['titulo'] ?? 'Sin título';
     final String descripcion = solicitud['descripcion'] ?? 'Sin descripción';
+    final String userNombre = nombreUsuario ?? 'Usuario desconocido';
 
     return Card(
       elevation: 5,
@@ -162,6 +193,16 @@ class _InterfazSolicitudesPState extends State<InterfazSolicitudesP> {
                 fontSize: 18,
                 fontWeight: FontWeight.normal,
                 color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 10),
+            // Mostrar el nombre del usuario
+            Text(
+              'Usuario: $userNombre',
+              style: TextStyle(
+                fontFamily: 'SF-Pro-Text',
+                fontSize: 16,
+                color: Colors.grey[600],
               ),
             ),
             SizedBox(height: 10),

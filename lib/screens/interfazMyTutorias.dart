@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:modular2/screens/InterfazRegistrarTutoria.dart';
-import 'package:modular2/services/storage_service.dart';
+import 'package:TutorMeUp/screens/InterfazRegistrarTutoria.dart';
+import 'package:TutorMeUp/services/storage_service.dart';
 
 class InterfazMyTutorias extends StatefulWidget {
   InterfazMyTutorias();
@@ -320,8 +320,7 @@ class _ModificarTutoriaState extends State<ModificarTutoria> {
   }
 
   // Seleccionar una hora
-  Future<void> _seleccionarHora(
-      BuildContext context, bool esHoraInicio) async {
+  Future<void> _seleccionarHora(BuildContext context, bool esHoraInicio) async {
     final TimeOfDay? horaElegida = await showTimePicker(
       context: context,
       initialTime: esHoraInicio
@@ -409,7 +408,8 @@ class _ModificarTutoriaState extends State<ModificarTutoria> {
             // Botón para seleccionar la hora de inicio
             Row(
               children: [
-                Text('Hora de inicio: ${_horaInicio?.format(context) ?? 'Seleccionar'}'),
+                Text(
+                    'Hora de inicio: ${_horaInicio?.format(context) ?? 'Seleccionar'}'),
                 IconButton(
                   icon: Icon(Icons.access_time),
                   onPressed: () => _seleccionarHora(context, true),
@@ -419,7 +419,8 @@ class _ModificarTutoriaState extends State<ModificarTutoria> {
             // Botón para seleccionar la hora de fin
             Row(
               children: [
-                Text('Hora de fin: ${_horaFin?.format(context) ?? 'Seleccionar'}'),
+                Text(
+                    'Hora de fin: ${_horaFin?.format(context) ?? 'Seleccionar'}'),
                 IconButton(
                   icon: Icon(Icons.access_time),
                   onPressed: () => _seleccionarHora(context, false),

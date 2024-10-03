@@ -1,4 +1,4 @@
-name: modular2
+name: TutorMeUp
 description: A new Flutter project.
 
 publish_to: 'none' # Remove this line if you are publishing to pub.dev
@@ -27,8 +27,15 @@ dependencies:
   shared_preferences: ^2.2.3
 
 dev_dependencies:
+  flutter_launcher_icons: "^0.9.2"
   flutter_test:
     sdk: flutter
+    
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/iconoTutorMeUp.png"
 
 flutter:
 

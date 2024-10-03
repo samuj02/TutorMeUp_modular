@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:modular2/screens/customTextField.dart';
-import 'package:modular2/screens/interfazAddChooseMateria.dart';
-import 'package:modular2/services/storage_service.dart';
+import 'package:TutorMeUp/screens/customTextField.dart';
+import 'package:TutorMeUp/screens/interfazAddChooseMateria.dart';
+import 'package:TutorMeUp/services/storage_service.dart';
 
 class RegistrarTutoria extends StatefulWidget {
   RegistrarTutoria();

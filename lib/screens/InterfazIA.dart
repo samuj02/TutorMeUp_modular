@@ -249,13 +249,24 @@ class _InterfazIAState extends State<InterfazIA> {
           content: Column(
             mainAxisSize: MainAxisSize.min, // Ajustar al tamaño del contenido
             children: _recommendedSubjects.map((subject) {
-              return Text(subject);
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(subject),  // Mostrar la materia
+                  ElevatedButton(
+                    onPressed: () {
+                      //sInterfazTutorias(context, subject);  // Redirigir al filtro de tutorías
+                    },
+                    child: Text('Buscar Tutoría'),
+                  ),
+                ],
+              );
             }).toList(),
           ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Cerrar el diálogo
+                Navigator.of(context).pop();  // Cerrar el diálogo
               },
               child: Text('Cerrar'),
             ),
@@ -392,7 +403,7 @@ class _InterfazIAState extends State<InterfazIA> {
       materiasConRefuerzo.add('Programación');
     }
     if (resultado['Necesita_Ayuda_Probabilidad_Y_Estadistica'] == 1) {
-      materiasConRefuerzo.add('Probabilidad y Estadística');
+      materiasConRefuerzo.add('Probabilidad y Est.');
     }
 
     setState(() {

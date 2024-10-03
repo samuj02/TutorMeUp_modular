@@ -2,12 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Se requiere acceso a la biblioteca de fotos para actualizar la imagen de perfil.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Se requiere acceso a la cámara para tomar una foto de perfil.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Se requiere acceso al micrófono.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Modular2</string>
+	<string>TutorMeUp</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

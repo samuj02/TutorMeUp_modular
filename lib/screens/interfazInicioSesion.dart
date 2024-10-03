@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Importar Firestore
-import 'package:modular2/services/storage_service.dart';
-import 'package:modular2/services/validaciones.dart';
+import 'package:TutorMeUp/services/storage_service.dart';
+import 'package:TutorMeUp/services/validaciones.dart';
 
 class PantallaInicioSesion extends StatefulWidget {
   @override

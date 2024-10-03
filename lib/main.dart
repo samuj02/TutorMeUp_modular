@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:modular2/screens/interfazMiPerfil.dart';
-import 'package:modular2/screens/interfazInicioSesion.dart';
-import 'package:modular2/screens/interfazRegistrarse.dart';
-import 'package:modular2/screens/interfazTutorias.dart';
-import 'package:modular2/screens/interfazMyTutorias.dart';
-import 'package:modular2/screens/interfazAgenda.dart';
-import 'package:modular2/screens/inicioApp.dart';
-import 'package:modular2/screens/interfazMapa.dart';
-import 'package:modular2/screens/InterfazIA.dart';
-import 'package:modular2/screens/InterfazRegistrarTutoria.dart';
-import 'package:modular2/screens/interfazSolicitudesP.dart';
-import 'package:modular2/services/storage_service.dart';
+import 'package:TutorMeUp/screens/interfazMiPerfil.dart';
+import 'package:TutorMeUp/screens/interfazInicioSesion.dart';
+import 'package:TutorMeUp/screens/interfazRegistrarse.dart';
+import 'package:TutorMeUp/screens/interfazTutorias.dart';
+import 'package:TutorMeUp/screens/interfazMyTutorias.dart';
+import 'package:TutorMeUp/screens/interfazAgenda.dart';
+import 'package:TutorMeUp/screens/inicioApp.dart';
+import 'package:TutorMeUp/screens/interfazMapa.dart';
+import 'package:TutorMeUp/screens/InterfazIA.dart';
+import 'package:TutorMeUp/screens/InterfazRegistrarTutoria.dart';
+import 'package:TutorMeUp/screens/interfazSolicitudesP.dart';
+import 'package:TutorMeUp/services/storage_service.dart';
 
 void main() async {
   // Asegúrate de que los Widgets de Flutter estén inicializados antes de Firebase

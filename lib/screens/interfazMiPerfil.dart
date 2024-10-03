@@ -4,7 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:modular2/services/storage_service.dart';
+import 'package:TutorMeUp/services/storage_service.dart';
 import 'widgets.dart';
 
 class InterfazMiPerfil extends StatefulWidget {
@@ -76,7 +76,7 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
   }
 
   Future<void> _escogerImagen() async {
-    // Código para seleccionar la imagen desde la galería
+  try {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
@@ -85,8 +85,17 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
         _imagen = File(pickedFile.path);
       });
       _cargarImagen(_imagen!);
+    } else {
+      // Si no se selecciona ninguna imagen, puedes manejarlo
+      print('No se seleccionó ninguna imagen.');
     }
+  } catch (e) {
+    print('Error al seleccionar la imagen: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error al seleccionar la imagen')),
+    );
   }
+}
 
   Future<void> _cargarImagen(File image) async {
     try {
@@ -124,6 +133,7 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
       'email': _emailController.text,
       'carrera': _carreraController.text,
       'telefono': _telefonoController.text,
+      'imagen_perfil': userData['imagen_perfil']
     };
 
     try {
@@ -206,22 +216,25 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
                                           CircleAvatar(
                                             backgroundColor: Color(0xFFAAC2E3),
                                             radius: 80.0,
-                                            backgroundImage: userData[
-                                                        'imagen_perfil'] !=
-                                                    ''
+                                            backgroundImage: (userData[
+                                                            'imagen_perfil'] !=
+                                                        null &&
+                                                    userData['imagen_perfil'] !=
+                                                        '')
                                                 ? CachedNetworkImageProvider(
                                                     userData['imagen_perfil']
-                                                        as String,
-                                                  )
+                                                        as String)
+                                                : null, // No hay imagen si es null o cadena vacía
+                                            child: (userData['imagen_perfil'] ==
+                                                        null ||
+                                                    userData['imagen_perfil'] ==
+                                                        '')
+                                                ? Icon(
+                                                    Icons.person_2_rounded,
+                                                    size: 70.0,
+                                                    color: Colors.black,
+                                                  ) // Mostrar el ícono por defecto si no hay imagen
                                                 : null,
-                                            child:
-                                                userData['imagen_perfil'] == ''
-                                                    ? Icon(
-                                                        Icons.person_2_rounded,
-                                                        size: 70.0,
-                                                        color: Colors.black,
-                                                      )
-                                                    : null,
                                           ),
                                           Positioned(
                                             bottom: 0.0,
@@ -313,60 +326,71 @@ class _InterfazMiPerfil extends State<InterfazMiPerfil> {
                                                   "Teléfono",
                                                   _telefonoController),
                                               SizedBox(height: 20),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
                                                 children: [
-                                                  ElevatedButton(
-                                                    onPressed: _saveChanges,
-                                                    child: Text(
-                                                      'Guardar cambios',
-                                                      style: TextStyle(
-                                                          fontFamily:
-                                                              'SF-Pro-Text',
-                                                          fontSize: 14.0,
-                                                          fontWeight:
-                                                              FontWeight.w700),
-                                                    ),
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                            backgroundColor:
-                                                                Color(
-                                                                    0xFFFFE74C),
-                                                            shadowColor:
-                                                                Colors.black,
-                                                            elevation: 20.0,
-                                                            foregroundColor:
-                                                                Colors.black),
-                                                  ),
-                                                  SizedBox(width: 10),
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        _isEditing = false;
-                                                      });
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                            backgroundColor:
-                                                                Color(
-                                                                    0xFFFF934F),
-                                                            shadowColor:
-                                                                Colors.black,
-                                                            elevation: 20.0,
-                                                            foregroundColor:
-                                                                Colors.white),
-                                                    child: Text('Cancelar',
-                                                        style: TextStyle(
+                                                  Wrap(
+                                                    spacing:
+                                                        10.0, // ajustar espacio de bonotes
+                                                    children: [
+                                                      ElevatedButton(
+                                                        onPressed: _saveChanges,
+                                                        child: Text(
+                                                          'Guardar cambios',
+                                                          style: TextStyle(
                                                             fontFamily:
                                                                 'SF-Pro-Text',
                                                             fontSize: 14.0,
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .w700)),
+                                                                FontWeight.w700,
+                                                          ),
+                                                        ),
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              Color(0xFFFFE74C),
+                                                          shadowColor:
+                                                              Colors.black,
+                                                          elevation: 20.0,
+                                                          foregroundColor:
+                                                              Colors.black,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 8.0),
+                                                  Center(
+                                                    child: ElevatedButton(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          _isEditing = false;
+                                                        });
+                                                      },
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Color(0xFFFF934F),
+                                                        shadowColor:
+                                                            Colors.black,
+                                                        elevation: 20.0,
+                                                        foregroundColor:
+                                                            Colors.white,
+                                                      ),
+                                                      child: Text(
+                                                        'Cancelar',
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'SF-Pro-Text',
+                                                          fontSize: 14.0,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ),
                                                 ],
-                                              ),
+                                              )
                                             ],
                                           )
                                         : Column(

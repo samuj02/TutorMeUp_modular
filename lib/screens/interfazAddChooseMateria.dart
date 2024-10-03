@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:modular2/screens/customTimeField.dart';
-import 'package:modular2/screens/interfazMyTutorias.dart';
+import 'package:TutorMeUp/screens/customTimeField.dart';
+import 'package:TutorMeUp/screens/interfazMyTutorias.dart';
 
 class AddChooseMateria extends StatefulWidget {
   final Map<String, dynamic>? datosTutoria;

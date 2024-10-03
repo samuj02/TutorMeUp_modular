@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:modular2/screens/interfazMiPerfil.dart';
-import 'package:modular2/screens/logout.dart';
+import 'package:TutorMeUp/screens/interfazMiPerfil.dart';
+import 'package:TutorMeUp/screens/logout.dart';
 
 void showCustomMenu(BuildContext context) {
   String selectedItem = '';
