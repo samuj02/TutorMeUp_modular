@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:TutorMeUp/screens/interfazTutorias.dart';
 import 'dart:convert';
 
 class InterfazIA extends StatefulWidget {
@@ -241,40 +242,42 @@ class _InterfazIAState extends State<InterfazIA> {
   List<String> _recommendedSubjects = [];
 
   void _showResultsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Te recomendamos fortalecer:'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min, // Ajustar al tamaño del contenido
-            children: _recommendedSubjects.map((subject) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(subject),  // Mostrar la materia
-                  ElevatedButton(
-                    onPressed: () {
-                      //sInterfazTutorias(context, subject);  // Redirigir al filtro de tutorías
-                    },
-                    child: Text('Buscar Tutoría'),
-                  ),
-                ],
-              );
-            }).toList(),
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Te recomendamos fortalecer:'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: _recommendedSubjects.map((subject) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(subject),  // Mostrar la materia
+                ElevatedButton(
+                  onPressed: () {
+                    // Redirigir a InterfazTutorias con la materia
+                    _buscarTutoria(subject);
+                  },
+                  child: Text('Buscar Tutoría'),
+                ),
+              ],
+            );
+          }).toList(),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();  // Cerrar el diálogo
+            },
+            child: Text('Cerrar'),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();  // Cerrar el diálogo
-              },
-              child: Text('Cerrar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+        ],
+      );
+    },
+  );
+}
+
 
   // Mostrar las recomendaciones en la interfaz
   @override
@@ -356,6 +359,15 @@ class _InterfazIAState extends State<InterfazIA> {
       _getRecommendations();
     }
   }
+
+  void _buscarTutoria(String materiaReforzar) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => InterfazTutorias(materiaBuscada: materiaReforzar),
+    ),
+  );
+}
 
   // Enviar los promedios a la API de PythonAnywhere para obtener las predicciones
   void _getRecommendations() async {

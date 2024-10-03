@@ -51,7 +51,8 @@ class InicioApp extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => InterfazTutorias(userId)),
+                      builder: (context) => InterfazTutorias(userId: userId),
+                    ),
                 );
               }),
               _buildGridButton(

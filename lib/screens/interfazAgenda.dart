@@ -77,7 +77,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => InterfazTutorias(widget.userId),
+        builder: (context) => InterfazTutorias(userId: widget.userId, materiaBuscada: 'Matemáticas'),
       ),
     );
   }

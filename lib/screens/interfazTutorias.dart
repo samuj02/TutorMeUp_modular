@@ -4,9 +4,9 @@ import 'package:TutorMeUp/services/storage_service.dart';
 
 class InterfazTutorias extends StatefulWidget {
   final String? userId;
+  final String? materiaBuscada;
 
-  InterfazTutorias([this.userId]);
-  
+  InterfazTutorias({this.userId, this.materiaBuscada});
 
   @override
   _InterfazTutoriasState createState() => _InterfazTutoriasState();
@@ -22,6 +22,11 @@ class _InterfazTutoriasState extends State<InterfazTutorias> {
     super.initState();
     _fetchTutorias();
     _searchController.addListener(_filterTutorias); // Escucha cambios en la barra de búsqueda
+    
+    if (widget.materiaBuscada != null && widget.materiaBuscada!.isNotEmpty) {
+      _searchController.text = widget.materiaBuscada!;
+      _filterTutorias();
+    }
   }
 
   Future<void> _fetchTutorias() async {
