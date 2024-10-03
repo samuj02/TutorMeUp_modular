@@ -2,6 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Tu app necesita acceder a tu ubicación para mostrar mapas precisos.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Tu app necesita acceder a tu ubicación siempre.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Tu app necesita acceder a tu ubicación siempre y cuando esté en uso.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to show nearby places.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We need your location to show nearby places.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Se requiere acceso a la biblioteca de fotos para actualizar la imagen de perfil.</string>
 	<key>NSCameraUsageDescription</key>
