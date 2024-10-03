@@ -1,9 +1,11 @@
+import 'package:TutorMeUp/services/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'interfazTutorias.dart'; // Asegúrate de importar la interfazTutorias.dart
 
 class AgendaScreen extends StatefulWidget {
-  final String? userId; // Cambié a String ya que los IDs de Firestore suelen ser cadenas
+  final String?
+      userId; // Cambié a String ya que los IDs de Firestore suelen ser cadenas
 
   AgendaScreen({this.userId});
 
@@ -13,24 +15,44 @@ class AgendaScreen extends StatefulWidget {
 
 class _AgendaScreenState extends State<AgendaScreen> {
   List<DocumentSnapshot> _agendadas = [];
+  String? _docId;
 
   @override
   void initState() {
     super.initState();
+    _getDocumentId();
     _fetchAgendadas();
+  }
+
+  Future<void> _getDocumentId() async {
+    String? storedUserId = await StorageService.getUserId();
+    print("Mi user: $storedUserId");
+    if (storedUserId != null) {
+      setState(() {
+        _docId = storedUserId;
+      });
+    }
   }
 
   Future<void> _fetchAgendadas() async {
     try {
-      // Obtener las tutorías agendadas para el usuario actual en Firestore
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('agendas')
-          .where('user_id', isEqualTo: widget.userId)
-          .get();
+      String? storedUserId = await StorageService
+          .getUserId(); // Asegúrate de obtener el ID correcto aquí
+      print("Mi user: $storedUserId");
 
-      setState(() {
-        _agendadas = querySnapshot.docs;
-      });
+      // Obtener las tutorías agendadas para el usuario actual en Firestore
+      if (storedUserId != null) {
+        // Asegúrate de que el userId no sea null
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('agendas')
+            .where('user_id',
+                isEqualTo: storedUserId) // Usa storedUserId para filtrar
+            .get();
+
+        setState(() {
+          _agendadas = querySnapshot.docs;
+        });
+      }
     } catch (e) {
       print('Error fetching agendadas: $e');
     }
@@ -39,7 +61,10 @@ class _AgendaScreenState extends State<AgendaScreen> {
   Future<void> _cancelarTutoria(String tutoriaId) async {
     try {
       // Eliminar la tutoría agendada de Firestore
-      await FirebaseFirestore.instance.collection('agendas').doc(tutoriaId).delete();
+      await FirebaseFirestore.instance
+          .collection('agendas')
+          .doc(tutoriaId)
+          .delete();
       // Volver a cargar las tutorías agendadas
       _fetchAgendadas();
     } catch (e) {
@@ -77,7 +102,8 @@ class _AgendaScreenState extends State<AgendaScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => InterfazTutorias(userId: widget.userId, materiaBuscada: 'Matemáticas'),
+        builder: (context) => InterfazTutorias(
+            userId: widget.userId, materiaBuscada: 'Matemáticas'),
       ),
     );
   }

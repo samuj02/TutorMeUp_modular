@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     
     <application
-        android:label="google_maps_in_flutter"
+        android:label="TutorMeUp"
         android:icon="@mipmap/ic_launcher">
 
         <!-- TODO: Add your Google Maps API key here -->
