@@ -199,7 +199,7 @@ class _PantallaRegistrarseState extends State<PantallaRegistrarse> {
                     colorTheme: Color(0xFF5575A0)),
                 SizedBox(height: 40),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     // Campos a validar
                     String email = _emailController.text;
                     String password = _passwordController.text;
@@ -228,6 +228,18 @@ class _PantallaRegistrarseState extends State<PantallaRegistrarse> {
                     if (!isValidPassword(password)) {
                       _showErrorDialog(
                           "La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula y un símbolo especial.");
+                      return;
+                    }
+
+                    if (await checkEmailExists(email)) {
+                      _showErrorDialog(
+                          "El correo electrónico ya está registrado.");
+                      return;
+                    }
+
+                    if (!isValidPhoneNumber(_telefonoController.text)) {
+                      _showErrorDialog(
+                          "El número de teléfono debe contener exactamente 10 dígitos numéricos.");
                       return;
                     }
 

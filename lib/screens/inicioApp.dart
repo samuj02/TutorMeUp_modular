@@ -51,8 +51,8 @@ class InicioApp extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => InterfazTutorias(userId: userId),
-                    ),
+                    builder: (context) => InterfazTutorias(userId: userId),
+                  ),
                 );
               }),
               _buildGridButton(
@@ -89,7 +89,7 @@ class InicioApp extends StatelessWidget {
                 );
               }),
               _buildGridButton(
-                  context, 'Examen IA', Icons.book, Color(0xFF004BAD), () {
+                  context, 'Examen IA', Icons.book, Color(0xFF4682B4), () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => InterfazIA()),
