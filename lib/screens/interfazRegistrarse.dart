@@ -32,7 +32,8 @@ class _PantallaRegistrarseState extends State<PantallaRegistrarse> {
         'telefono': int.parse(_telefonoController.text),
         'imagen_perfil': '',
         'user_id': DateTime.now()
-            .millisecondsSinceEpoch, // Generar un ID único basado en el tiempo
+            .millisecondsSinceEpoch,
+        'tutor_autorizado': false, // Valor predeterminado: no autorizado // Generar un ID único basado en el tiempo
       });
 
       // Obtener el ID del documento recién creado

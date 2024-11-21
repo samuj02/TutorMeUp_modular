@@ -257,45 +257,86 @@ class _InterfazTutoriasState extends State<InterfazTutorias> {
     );
   }
 
+  
   Widget _buildTutoriaCard(DocumentSnapshot tutoria, Widget horarioWidget) {
-    return Card(
-      elevation: 5,
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: InkWell(
-        onTap: () => _mostrarDetallesTutoria(context, tutoria),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                tutoria['titulo'],
-                style: TextStyle(
-                  fontFamily: 'SF-Pro-Rounded',
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF3A6CAD),
-                ),
+  return FutureBuilder<DocumentSnapshot>(
+    future: FirebaseFirestore.instance
+        .collection('user')
+        .doc(tutoria['user_id']) // Buscar por el user_id del creador
+        .get(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Text('Error al cargar el usuario');
+      } else {
+        // Obtener el nombre y la imagen del perfil
+        String userName = snapshot.data!['nombre'] ?? 'Desconocido';
+        String imageUrl = snapshot.data!['imagen_perfil'] ?? '';
+
+        return InkWell(
+          onTap: () => _mostrarDetallesTutoria(context, tutoria),
+          child: Card(
+            elevation: 5,
+            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Contenido principal (Título y tutor)
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              tutoria['titulo'],
+                              style: TextStyle(
+                                fontFamily: 'SF-Pro-Rounded',
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF3A6CAD),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Tutor: $userName',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Imagen del perfil alineada a la derecha
+                      CircleAvatar(
+                        radius: 30, // Tamaño de la imagen circular
+                        backgroundImage: imageUrl.isNotEmpty
+                            ? NetworkImage(imageUrl)
+                            : AssetImage('assets/default_profile.png')
+                                as ImageProvider,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  // Horarios y aula
+                  horarioWidget,
+                ],
               ),
-              SizedBox(height: 8),
-              Text(
-                tutoria['descripcion'],
-                style: TextStyle(
-                  fontFamily: 'SF-Pro-Text',
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal,
-                  color: Colors.black87,
-                ),
-              ),
-              SizedBox(height: 10),
-              horarioWidget,  // Añadimos el widget de los horarios y aula
-            ],
+            ),
           ),
-        ),
-      ),
-    );
-  }
+        );
+      }
+    },
+  );
+}
+
 }
